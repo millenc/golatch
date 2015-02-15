@@ -60,7 +60,7 @@ func (l *Latch) SetSecretKey(secretKey string) {
 
 //Pairs an account with the pairing token
 func (l *Latch) Pair(token string) *LatchRequest {
-	request := NewLatchRequest(l.AppID(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now())
+	request := NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now())
 	return request
 }
 

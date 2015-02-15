@@ -2,6 +2,9 @@ package golatch
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	"sort"
 	"strings"
@@ -10,17 +13,19 @@ import (
 
 type LatchRequest struct {
 	AppID       string
+	SecretKey   string
 	HttpMethod  string
 	QueryString string
 	XHeaders    map[string]string
-	Params      map[string]string
+	Params      map[string][]string
 	Date        time.Time
 }
 
 //Returns a new LatchRequest initialized with the parameters provided
-func NewLatchRequest(appID string, httpMethod string, queryString string, xHeaders map[string]string, params map[string]string, date time.Time) *LatchRequest {
+func NewLatchRequest(appID string, secretKey string, httpMethod string, queryString string, xHeaders map[string]string, params map[string][]string, date time.Time) *LatchRequest {
 	return &LatchRequest{
 		AppID:       appID,
+		SecretKey:   secretKey,
 		HttpMethod:  httpMethod,
 		QueryString: queryString,
 		XHeaders:    xHeaders,
@@ -44,7 +49,16 @@ func (l *LatchRequest) GetAuthorizationHeader() string {
 		API_AUTHORIZATION_HEADER_FIELD_SEPARATOR,
 		l.AppID,
 		API_AUTHORIZATION_HEADER_FIELD_SEPARATOR,
-		l.GetRequestSignature())
+		l.GetSignedRequestSignature())
+}
+
+//Gets the signed request signature using HMAC-SHA1 (base64-encoded)
+func (l *LatchRequest) GetSignedRequestSignature() string {
+	key := []byte(l.SecretKey)
+	h := hmac.New(sha1.New, key)
+	h.Write([]byte(l.GetRequestSignature()))
+
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
 //Gets the request signature
@@ -95,7 +109,31 @@ func (l *LatchRequest) GetSerializedHeaders() string {
 
 //Gets the serialized request headers (xHeaders) to use in the request signature
 func (l *LatchRequest) GetSerializedParams() string {
-	return ""
+	if l.Params == nil {
+		return ""
+	}
+
+	//Get parameter names and sort them alphabetically
+	m := make(map[string][]string)
+	var keys []string
+	for k, v := range l.Params {
+		keys = append(keys, k)
+		sort.Strings(v) //Sort parameter values
+		m[k] = v
+	}
+	sort.Strings(keys)
+
+	//Serialize
+	var buffer bytes.Buffer
+	for _, key := range keys {
+		values := m[key]
+
+		for _, value := range values {
+			buffer.WriteString(fmt.Sprint(key, "=", value, "&"))
+		}
+	}
+
+	return strings.Trim(buffer.String(), " &")
 }
 
 //Gets the current UTC Date/Time as a string formatted using the layout specified in const(API_UTC_STRING_FORMAT)
