@@ -7,8 +7,9 @@ import (
 
 const (
 	//Latch related constants
+	API_URL                                  = "https://latch.elevenpaths.com"
+	API_PATH                                 = "/api"
 	API_VERSION                              = "0.9"
-	API_URL                                  = "https://latch.elevenpaths.com/api"
 	API_CHECK_STATUS_ACTION                  = "status"
 	API_PAIR_ACTION                          = "pair"
 	API_PAIR_WITH_ID_ACTION                  = "pairWithId"
@@ -57,21 +58,13 @@ func (l *Latch) SetSecretKey(secretKey string) {
 	l.secretKey = secretKey
 }
 
-//Get the authorization header
-func (l *Latch) GetAuthorizationHeader() string {
-	return fmt.Sprint(API_AUTHENTICATION_METHOD,
-		API_AUTHORIZATION_HEADER_FIELD_SEPARATOR,
-		l.AppID(),
-		API_AUTHORIZATION_HEADER_FIELD_SEPARATOR,
-		l.GetRequestSignature())
+//Pairs an account with the pairing token
+func (l *Latch) Pair(token string) *LatchRequest {
+	request := NewLatchRequest(l.AppID(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now())
+	return request
 }
 
-//Gets the request signature
-func (l *Latch) GetRequestSignature() string {
-	return ""
-}
-
-//Gets the current UTC Date/Time as a string formatted using the layout specified in const(API_UTC_STRING_FORMAT)
-func (l *Latch) getCurrentDateTime() string {
-	return t.Now().UTC().Format(API_UTC_STRING_FORMAT)
+//Gets the complete url for a request
+func GetLatchQueryString(queryString string) string {
+	return fmt.Sprint(API_PATH, "/", API_VERSION, "/", queryString)
 }

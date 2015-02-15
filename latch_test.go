@@ -1,20 +1,34 @@
 package golatch
 
 import (
-	"regexp"
+	"fmt"
 	"testing"
 )
 
-func TestGetCurrentDateTime(t *testing.T) {
+func TestSetAppID(t *testing.T) {
 	l := &Latch{}
-	d := l.getCurrentDateTime()
+	appID := "MyAppID"
 
-	if l == nil || len(d) == 0 {
-		t.Error("Null or empty date time")
-	} else {
-		match, _ := regexp.MatchString(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}`, d)
-		if !match {
-			t.Errorf("Date %s doesn't have the expected format.", d)
-		}
+	l.SetAppID(appID)
+	if l.AppID() != appID {
+		t.Errorf("SetAppID()/AppID() failed: expected %q, got %q", appID, l.AppID())
+	}
+}
+
+func TestSetSecretKey(t *testing.T) {
+	l := &Latch{}
+	secretKey := "MySecretKey"
+
+	l.SetSecretKey(secretKey)
+	if l.SecretKey() != secretKey {
+		t.Errorf("SetSecretKey()/SecretKey() failed: expected %q, got %q", secretKey, l.SecretKey())
+	}
+}
+
+func TestGetLatchQueryString(t *testing.T) {
+	expected := fmt.Sprint(API_PATH, "/", API_VERSION, "/", API_PAIR_ACTION, "/", "my_token")
+
+	if got := GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", "my_token")); got != expected {
+		t.Errorf("GetLatchQueryString() failed: expected %q, got %q", expected, got)
 	}
 }
