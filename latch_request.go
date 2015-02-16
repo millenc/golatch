@@ -6,6 +6,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
+	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -139,4 +140,18 @@ func (l *LatchRequest) GetSerializedParams() string {
 //Gets the current UTC Date/Time as a string formatted using the layout specified in const(API_UTC_STRING_FORMAT)
 func (l *LatchRequest) GetFormattedDate() string {
 	return l.Date.UTC().Format(API_UTC_STRING_FORMAT)
+}
+
+//Gets the HTTP request for this Latch Request
+func (l *LatchRequest) GetHttpRequest() *http.Request {
+	//TODO: Get the URL from the LatchRequest?
+	request, _ := http.NewRequest(l.HttpMethod, fmt.Sprint(API_URL, l.QueryString), nil)
+
+	//Set Headers
+	headers := l.GetAuthenticationHeaders()
+	for header, value := range headers {
+		request.Header.Set(header, value)
+	}
+
+	return request
 }

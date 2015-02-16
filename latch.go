@@ -1,7 +1,10 @@
 package golatch
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	t "time"
 )
 
@@ -59,9 +62,43 @@ func (l *Latch) SetSecretKey(secretKey string) {
 }
 
 //Pairs an account with the pairing token
-func (l *Latch) Pair(token string) *LatchRequest {
-	request := NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now())
-	return request
+func (l *Latch) Pair(token string) (*LatchPairResponse, error) {
+	response, err := l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now()), &LatchPairResponse{})
+	return (*response).(*LatchPairResponse), err
+}
+
+func (l *Latch) DoRequest(request *LatchRequest, responseType LatchResponse) (response *LatchResponse, err error) {
+	client := &http.Client{}
+	req := request.GetHttpRequest()
+
+	//Perform the request
+	resp, err := client.Do(req)
+	if err != nil {
+		return
+	}
+
+	//Get the response's body
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	//Handle HTTP errors
+	if resp.StatusCode != 200 {
+		err = errors.New(fmt.Sprintf("HTTP error [%d] body: %s", resp.StatusCode, body))
+		return
+	}
+
+	//TODO: Check if the response is an error before decoding it
+
+	//Decode response into a typed response (if one has been specified)
+	if responseType != nil {
+		err = responseType.Unmarshal(string(body))
+		response = &responseType
+	}
+
+	return response, err
 }
 
 //Gets the complete url for a request
