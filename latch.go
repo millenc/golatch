@@ -1,6 +1,7 @@
 package golatch
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -62,25 +63,28 @@ func (l *Latch) SetSecretKey(secretKey string) {
 }
 
 //Pairs an account with the pairing token
-func (l *Latch) Pair(token string) (*LatchPairResponse, error) {
-	response, err := l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now()), &LatchPairResponse{})
-	return (*response).(*LatchPairResponse), err
+func (l *Latch) Pair(token string) (response *LatchPairResponse, err error) {
+	var resp *LatchResponse
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now()), &LatchPairResponse{}); err == nil {
+		response = (*resp).(*LatchPairResponse)
+	}
+	return response, err
 }
 
 func (l *Latch) DoRequest(request *LatchRequest, responseType LatchResponse) (response *LatchResponse, err error) {
 	client := &http.Client{}
 	req := request.GetHttpRequest()
+	var resp *http.Response
+	var body []byte
 
 	//Perform the request
-	resp, err := client.Do(req)
-	if err != nil {
+	if resp, err = client.Do(req); err != nil {
 		return
 	}
 
 	//Get the response's body
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	if body, err = ioutil.ReadAll(resp.Body); err != nil {
 		return
 	}
 
@@ -90,7 +94,14 @@ func (l *Latch) DoRequest(request *LatchRequest, responseType LatchResponse) (re
 		return
 	}
 
-	//TODO: Check if the response is an error before decoding it
+	//Check if the response is an error before decoding it
+	latch_error_response := &LatchErrorResponse{}
+	if err = json.Unmarshal(body, latch_error_response); err != nil {
+		return
+	} else if (*latch_error_response).Err.Code != 0 {
+		err = &latch_error_response.Err
+		return
+	}
 
 	//Decode response into a typed response (if one has been specified)
 	if responseType != nil {
