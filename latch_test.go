@@ -26,7 +26,7 @@ func TestSetSecretKey(t *testing.T) {
 }
 
 func TestGetLatchQueryString(t *testing.T) {
-	expected := fmt.Sprint(API_PATH, "/", API_VERSION, "/", API_PAIR_ACTION, "/", "my_token")
+	expected := "/api/0.9/pair/my_token"
 
 	if got := GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", "my_token")); got != expected {
 		t.Errorf("GetLatchQueryString() failed: expected %q, got %q", expected, got)

@@ -9,10 +9,10 @@ type LatchError struct {
 
 //Implementation of the error interface
 func (e *LatchError) Error() string {
-	return fmt.Sprintf("[%d]: %s", e.Code, e.Message)
+	return fmt.Sprintf("Latch Error: [%d] %s", e.Code, e.Message)
 }
 
 //Constructs a new error
-func (e *LatchError) NewLatchError(code int32, message string) error {
+func NewLatchError(code int32, message string) error {
 	return &LatchError{Code: code, Message: message}
 }
