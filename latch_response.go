@@ -2,7 +2,6 @@ package golatch
 
 import (
 	"encoding/json"
-	//"fmt"
 )
 
 type LatchResponse interface {
@@ -26,7 +25,9 @@ type LatchStatusResponse struct {
 }
 
 type LatchOperationResponse struct {
-	OperationId string `json:"operationId"`
+	Data struct {
+		OperationId string `json:"operationId"`
+	} `json:"data"`
 }
 
 type LatchOperationStatus struct {
