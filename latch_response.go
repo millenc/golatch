@@ -94,3 +94,10 @@ func (l *LatchStatusResponse) TwoFactor() LatchTwoFactor {
 func (l *LatchStatusResponse) Operations() map[string]LatchOperationStatus {
 	return l.GetParentOperation().Operations
 }
+
+func (l *LatchShowOperationResponse) Operation() (operation LatchOperation) {
+	for _, operation = range l.Data.Operations {
+		break
+	}
+	return
+}
