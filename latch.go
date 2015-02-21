@@ -22,6 +22,7 @@ const (
 	API_UNLOCK_ACTION                        = "unlock"
 	API_HISTORY_ACTION                       = "history"
 	API_OPERATION_ACTION                     = "operation"
+	API_NOOTP_SUFFIX                         = "nootp"
 	API_AUTHENTICATION_METHOD                = "11PATHS"
 	API_AUTHORIZATION_HEADER_NAME            = "Authorization"
 	API_DATE_HEADER_NAME                     = "X-11Paths-Date"
@@ -62,11 +63,43 @@ func (l *Latch) SetSecretKey(secretKey string) {
 	l.secretKey = secretKey
 }
 
-//Pairs an account with the pairing token
+//Pairs an account with the provided pairing token
 func (l *Latch) Pair(token string) (response *LatchPairResponse, err error) {
 	var resp *LatchResponse
 	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now()), &LatchPairResponse{}); err == nil {
 		response = (*resp).(*LatchPairResponse)
+	}
+	return response, err
+}
+
+//Gets the status of an account, given it's account ID
+//If nootp is true, the one time password won't be included in the response
+func (l *Latch) Status(accountId string, nootp bool) (response *LatchStatusResponse, err error) {
+	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId)
+	if nootp {
+		query = fmt.Sprint(query, "/nootp")
+	}
+
+	return l.StatusRequest(query)
+}
+
+//Gets the status of an operation, given it's account ID and operation ID
+//If nootp is true, the one time password won't be included in the response
+func (l *Latch) OperationStatus(accountId string, operationId string, nootp bool) (response *LatchStatusResponse, err error) {
+	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId, "/op/", operationId)
+	if nootp {
+		query = fmt.Sprint(query, "/nootp")
+	}
+
+	return l.StatusRequest(query)
+}
+
+//Performs a status request (application or operation) against the query URL provided
+//Returns a LatchStatusResponse struct on success
+func (l *Latch) StatusRequest(query string) (response *LatchStatusResponse, err error) {
+	var resp *LatchResponse
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(query), nil, nil, t.Now()), &LatchStatusResponse{}); err == nil {
+		response = (*resp).(*LatchStatusResponse)
 	}
 	return response, err
 }
