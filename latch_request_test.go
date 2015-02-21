@@ -1,6 +1,7 @@
 package golatch
 
 import (
+	"net/url"
 	"reflect"
 	"testing"
 	"time"
@@ -16,22 +17,22 @@ var example_request = &LatchRequest{AppID: "MyAppID",
 		"X-11paths-B": "Test value",
 		"X-11paths-A": "Line\nBreaks",
 	},
-	Params: map[string][]string{
-		"B[]": {"B", "A"},
-		"A":   {"A"},
+	Params: url.Values{
+		"B": {"B", "A"},
+		"A": {"A"},
 	},
 	Date: example_date,
 }
 var example_expected_formatted_date = "2015-02-15 14:53:00"
 var example_expected_serialized_headers = "x-11paths-a:Line Breaks x-11paths-b:Test value"
-var example_expected_serialized_params = "A=A&B[]=A&B[]=B"
+var example_expected_serialized_params = "A=A&B=A&B=B"
 
 var example_expected_signature = "POST\n" +
 	example_expected_formatted_date + "\n" +
 	example_expected_serialized_headers + "\n" +
 	"/api/0.9/pair/my_token\n" +
 	example_expected_serialized_params
-var example_expected_header = "11PATHS MyAppID dKuWhQ2YCcx3c92bus5Bp6wo7kk="
+var example_expected_header = "11PATHS MyAppID dEjOhFT+gdVCcBtm2LeMf4+qey8="
 
 func TestNewLatchRequest(t *testing.T) {
 	got_request := NewLatchRequest(example_request.AppID, example_request.SecretKey, example_request.HttpMethod, example_request.QueryString, example_request.XHeaders, example_request.Params, example_date)

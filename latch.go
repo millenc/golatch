@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	t "time"
 )
 
@@ -106,12 +107,11 @@ func (l *Latch) UnlockOperation(accountId string, operationId string) (err error
 func (l *Latch) AddOperation(parentId string, name string, twoFactor string, lockOnRequest string) (response *LatchOperationResponse, err error) {
 	var resp *LatchResponse
 
-	params := map[string][]string{
-		"parentId":        {parentId},
-		"name":            {name},
-		"two_factor":      {twoFactor},
-		"lock_on_request": {lockOnRequest},
-	}
+	params := url.Values{}
+	params.Set("parentId", parentId)
+	params.Set("name", name)
+	params.Set("two_factor", twoFactor)
+	params.Set("lock_on_request", lockOnRequest)
 
 	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_PUT, GetLatchQueryString(API_OPERATION_ACTION), nil, params, t.Now()), &LatchOperationResponse{}); err == nil {
 		response = (*resp).(*LatchOperationResponse)

@@ -20,12 +20,12 @@ type LatchRequest struct {
 	HttpMethod  string
 	QueryString string
 	XHeaders    map[string]string
-	Params      map[string][]string
+	Params      url.Values
 	Date        time.Time
 }
 
 //Returns a new LatchRequest initialized with the parameters provided
-func NewLatchRequest(appID string, secretKey string, httpMethod string, queryString string, xHeaders map[string]string, params map[string][]string, date time.Time) *LatchRequest {
+func NewLatchRequest(appID string, secretKey string, httpMethod string, queryString string, xHeaders map[string]string, params url.Values, date time.Time) *LatchRequest {
 	return &LatchRequest{
 		AppID:       appID,
 		SecretKey:   secretKey,
@@ -116,27 +116,16 @@ func (l *LatchRequest) GetSerializedParams() string {
 		return ""
 	}
 
-	//Get parameter names and sort them alphabetically
-	m := make(map[string][]string)
-	var keys []string
-	for k, v := range l.Params {
-		keys = append(keys, k)
-		sort.Strings(v) //Sort parameter values
-		m[k] = v
-	}
-	sort.Strings(keys)
-
-	//Serialize
-	var buffer bytes.Buffer
-	for _, key := range keys {
-		values := m[key]
-
+	//Order parameter values alphabetically. url.Encode() will take care of ordering the keys
+	ordered_params := url.Values{}
+	for param, values := range l.Params {
+		sort.Strings(values) //Sort parameter values
 		for _, value := range values {
-			buffer.WriteString(fmt.Sprint(key, "=", value, "&"))
+			ordered_params.Add(param, value)
 		}
 	}
 
-	return strings.Trim(buffer.String(), " &")
+	return strings.Trim(ordered_params.Encode(), " &")
 }
 
 //Gets the current UTC Date/Time as a string formatted using the layout specified in const(API_UTC_STRING_FORMAT)
@@ -150,13 +139,7 @@ func (l *LatchRequest) GetHttpRequest() *http.Request {
 
 	//Include parameters for POST and PUT methods
 	if l.HttpMethod == HTTP_METHOD_PUT || l.HttpMethod == HTTP_METHOD_POST {
-		form := url.Values{}
-		for param, values := range l.Params {
-			for _, value := range values {
-				form.Add(param, value)
-			}
-		}
-		body = strings.NewReader(form.Encode())
+		body = strings.NewReader(l.Params.Encode())
 	}
 
 	//TODO: Get the URL from the LatchRequest?
