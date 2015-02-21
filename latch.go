@@ -72,6 +72,12 @@ func (l *Latch) Pair(token string) (response *LatchPairResponse, err error) {
 	return response, err
 }
 
+//Unpairs an account, given it's account ID
+func (l *Latch) Unpair(accountId string) (err error) {
+	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNPAIR_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
+	return err
+}
+
 //Gets the status of an account, given it's account ID
 //If nootp is true, the one time password won't be included in the response
 func (l *Latch) Status(accountId string, nootp bool) (response *LatchStatusResponse, err error) {
@@ -81,6 +87,30 @@ func (l *Latch) Status(accountId string, nootp bool) (response *LatchStatusRespo
 	}
 
 	return l.StatusRequest(query)
+}
+
+//Locks an account, given it's account ID
+func (l *Latch) Lock(accountId string) (err error) {
+	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_LOCK_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
+	return err
+}
+
+//Unlocks an account, given it's account ID
+func (l *Latch) Unlock(accountId string) (err error) {
+	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNLOCK_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
+	return err
+}
+
+//Locks an operation, given it's account ID and oeration ID
+func (l *Latch) LockOperation(accountId string, operationId string) (err error) {
+	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_LOCK_ACTION, "/", accountId, "/op/", operationId)), nil, nil, t.Now()), nil)
+	return err
+}
+
+//Unlocks an operation, given it's account ID and oeration ID
+func (l *Latch) UnlockOperation(accountId string, operationId string) (err error) {
+	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNLOCK_ACTION, "/", accountId, "/op/", operationId)), nil, nil, t.Now()), nil)
+	return err
 }
 
 //Gets the status of an operation, given it's account ID and operation ID
