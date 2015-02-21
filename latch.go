@@ -32,6 +32,13 @@ const (
 	API_X_11PATHS_HEADER_SEPARATOR           = ":"
 	API_UTC_STRING_FORMAT                    = "2006-01-02 15:04:05" //format layout as defined here: http://golang.org/pkg/time/#pkg-constants
 
+	//Possible values for the Two factor and Lock on request options
+	//NOT_SET is used in the UpdateOperation() method to leave the existing value
+	MANDATORY = "MANDATORY"
+	OPT_IN    = "OPT_IN"
+	DISABLED  = "DISABLED"
+	NOT_SET   = ""
+
 	//HTTP methods
 	HTTP_METHOD_POST   = "POST"
 	HTTP_METHOD_GET    = "GET"
@@ -104,7 +111,7 @@ func (l *Latch) UnlockOperation(accountId string, operationId string) (err error
 }
 
 //Adds a new operation
-func (l *Latch) AddOperation(parentId string, name string, twoFactor string, lockOnRequest string) (response *LatchOperationResponse, err error) {
+func (l *Latch) AddOperation(parentId string, name string, twoFactor string, lockOnRequest string) (response *LatchAddOperationResponse, err error) {
 	var resp *LatchResponse
 
 	params := url.Values{}
@@ -113,8 +120,39 @@ func (l *Latch) AddOperation(parentId string, name string, twoFactor string, loc
 	params.Set("two_factor", twoFactor)
 	params.Set("lock_on_request", lockOnRequest)
 
-	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_PUT, GetLatchQueryString(API_OPERATION_ACTION), nil, params, t.Now()), &LatchOperationResponse{}); err == nil {
-		response = (*resp).(*LatchOperationResponse)
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_PUT, GetLatchQueryString(API_OPERATION_ACTION), nil, params, t.Now()), &LatchAddOperationResponse{}); err == nil {
+		response = (*resp).(*LatchAddOperationResponse)
+	}
+	return response, err
+}
+
+//Updates an existing operation
+func (l *Latch) UpdateOperation(operationId string, name string, twoFactor string, lockOnRequest string) (err error) {
+	params := url.Values{}
+	params.Set("name", name)
+	if twoFactor != NOT_SET {
+		params.Set("two_factor", twoFactor)
+	}
+	if lockOnRequest != NOT_SET {
+		params.Set("lock_on_request", lockOnRequest)
+	}
+
+	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_POST, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, params, t.Now()), nil)
+	return err
+}
+
+//Deletes an existing operation
+func (l *Latch) DeleteOperation(operationId string) (err error) {
+	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_DELETE, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, nil, t.Now()), nil)
+	return err
+}
+
+//Shows operation
+func (l *Latch) ShowOperation(operationId string) (response *LatchShowOperationResponse, err error) {
+	var resp *LatchResponse
+
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, nil, t.Now()), &LatchShowOperationResponse{}); err == nil {
+		response = (*resp).(*LatchShowOperationResponse)
 	}
 	return response, err
 }

@@ -2,6 +2,7 @@ package golatch
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type LatchResponse interface {
@@ -24,12 +25,6 @@ type LatchStatusResponse struct {
 	} `json:"data"`
 }
 
-type LatchOperationResponse struct {
-	Data struct {
-		OperationId string `json:"operationId"`
-	} `json:"data"`
-}
-
 type LatchOperationStatus struct {
 	Status     string                          `json:"status"`
 	TwoFactor  LatchTwoFactor                  `json:"two_factor"`
@@ -39,6 +34,25 @@ type LatchOperationStatus struct {
 type LatchTwoFactor struct {
 	Token     string `json:"token"`
 	Generated string `json:"generated"`
+}
+
+type LatchAddOperationResponse struct {
+	Data struct {
+		OperationId string `json:"operationId"`
+	} `json:"data"`
+}
+
+type LatchShowOperationResponse struct {
+	Data struct {
+		Operations map[string]LatchOperation `json:"operations"`
+	} `json:"data"`
+}
+
+type LatchOperation struct {
+	Name          string                    `json:"name"`
+	TwoFactor     string                    `json:"two_factor"`
+	LockOnRequest string                    `json:"lock_on_request"`
+	Operations    map[string]LatchOperation `json:"operations"`
 }
 
 func (l *LatchErrorResponse) Unmarshal(Json string) error {
@@ -53,7 +67,12 @@ func (l *LatchStatusResponse) Unmarshal(Json string) (err error) {
 	return json.Unmarshal([]byte(Json), l)
 }
 
-func (l *LatchOperationResponse) Unmarshal(Json string) (err error) {
+func (l *LatchAddOperationResponse) Unmarshal(Json string) (err error) {
+	return json.Unmarshal([]byte(Json), l)
+}
+
+func (l *LatchShowOperationResponse) Unmarshal(Json string) (err error) {
+	fmt.Println(Json)
 	return json.Unmarshal([]byte(Json), l)
 }
 
