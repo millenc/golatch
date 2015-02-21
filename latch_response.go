@@ -25,6 +25,10 @@ type LatchStatusResponse struct {
 	} `json:"data"`
 }
 
+type LatchOperationResponse struct {
+	OperationId string `json:"operationId"`
+}
+
 type LatchOperationStatus struct {
 	Status     string                          `json:"status"`
 	TwoFactor  LatchTwoFactor                  `json:"two_factor"`
@@ -46,4 +50,27 @@ func (l *LatchPairResponse) Unmarshal(Json string) error {
 
 func (l *LatchStatusResponse) Unmarshal(Json string) (err error) {
 	return json.Unmarshal([]byte(Json), l)
+}
+
+func (l *LatchOperationResponse) Unmarshal(Json string) (err error) {
+	return json.Unmarshal([]byte(Json), l)
+}
+
+func (l *LatchStatusResponse) GetParentOperation() (operation LatchOperationStatus) {
+	for _, operation = range l.Data.Operations {
+		break
+	}
+	return
+}
+
+func (l *LatchStatusResponse) Status() string {
+	return l.GetParentOperation().Status
+}
+
+func (l *LatchStatusResponse) TwoFactor() LatchTwoFactor {
+	return l.GetParentOperation().TwoFactor
+}
+
+func (l *LatchStatusResponse) Operations() map[string]LatchOperationStatus {
+	return l.GetParentOperation().Operations
 }

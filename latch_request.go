@@ -6,7 +6,9 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"sort"
 	"strings"
 	"time"
@@ -144,13 +146,29 @@ func (l *LatchRequest) GetFormattedDate() string {
 
 //Gets the HTTP request for this Latch Request
 func (l *LatchRequest) GetHttpRequest() *http.Request {
+	var body io.Reader = nil
+
+	//Include parameters for POST and PUT methods
+	if l.HttpMethod == HTTP_METHOD_PUT || l.HttpMethod == HTTP_METHOD_POST {
+		form := url.Values{}
+		for param, values := range l.Params {
+			for _, value := range values {
+				form.Add(param, value)
+			}
+		}
+		body = strings.NewReader(form.Encode())
+	}
+
 	//TODO: Get the URL from the LatchRequest?
-	request, _ := http.NewRequest(l.HttpMethod, fmt.Sprint(API_URL, l.QueryString), nil)
+	request, _ := http.NewRequest(l.HttpMethod, fmt.Sprint(API_URL, l.QueryString), body)
 
 	//Set Headers
 	headers := l.GetAuthenticationHeaders()
 	for header, value := range headers {
 		request.Header.Set(header, value)
+	}
+	if l.HttpMethod == HTTP_METHOD_PUT || l.HttpMethod == HTTP_METHOD_POST {
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 
 	return request

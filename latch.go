@@ -78,17 +78,6 @@ func (l *Latch) Unpair(accountId string) (err error) {
 	return err
 }
 
-//Gets the status of an account, given it's account ID
-//If nootp is true, the one time password won't be included in the response
-func (l *Latch) Status(accountId string, nootp bool) (response *LatchStatusResponse, err error) {
-	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId)
-	if nootp {
-		query = fmt.Sprint(query, "/nootp")
-	}
-
-	return l.StatusRequest(query)
-}
-
 //Locks an account, given it's account ID
 func (l *Latch) Lock(accountId string) (err error) {
 	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_LOCK_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
@@ -111,6 +100,34 @@ func (l *Latch) LockOperation(accountId string, operationId string) (err error) 
 func (l *Latch) UnlockOperation(accountId string, operationId string) (err error) {
 	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNLOCK_ACTION, "/", accountId, "/op/", operationId)), nil, nil, t.Now()), nil)
 	return err
+}
+
+//Adds a new operation
+func (l *Latch) AddOperation(parentId string, name string, twoFactor string, lockOnRequest string) (response *LatchOperationResponse, err error) {
+	var resp *LatchResponse
+
+	params := map[string][]string{
+		"parentId":        {parentId},
+		"name":            {name},
+		"two_factor":      {twoFactor},
+		"lock_on_request": {lockOnRequest},
+	}
+
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_PUT, GetLatchQueryString(API_OPERATION_ACTION), nil, params, t.Now()), &LatchOperationResponse{}); err == nil {
+		response = (*resp).(*LatchOperationResponse)
+	}
+	return response, err
+}
+
+//Gets the status of an account, given it's account ID
+//If nootp is true, the one time password won't be included in the response
+func (l *Latch) Status(accountId string, nootp bool) (response *LatchStatusResponse, err error) {
+	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId)
+	if nootp {
+		query = fmt.Sprint(query, "/nootp")
+	}
+
+	return l.StatusRequest(query)
 }
 
 //Gets the status of an operation, given it's account ID and operation ID
