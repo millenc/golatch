@@ -23,7 +23,7 @@ func TestLatchPairResponseUnmarshal(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("LatchPairResponse.Unmarshal() failed json: json: %q , error %q", json, err)
-	} else if response.Data.AccountId != "MyAccountId" {
+	} else if response.AccountId() != "MyAccountId" {
 		t.Errorf("LatchPairResponse.Unmarshal() failed: json: %q , got %q", json, response)
 	}
 }
@@ -65,7 +65,7 @@ func TestLatchAddOperationResponse(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("LatchAddOperationResponse.Unmarshal() failed json: %q , error %q", json, err)
-	} else if response.Data.OperationId != "MyOperationId" {
+	} else if response.OperationId() != "MyOperationId" {
 		t.Errorf("LatchAddOperationResponse.Unmarshal() failed, expected operationId=%q : json: %q , got %q", "MyOperationId", json, response)
 	}
 }

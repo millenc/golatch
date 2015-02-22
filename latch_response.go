@@ -76,6 +76,14 @@ func (l *LatchShowOperationResponse) Unmarshal(Json string) (err error) {
 	return json.Unmarshal([]byte(Json), l)
 }
 
+func (l *LatchPairResponse) AccountId() string {
+	return l.Data.AccountId
+}
+
+func (l *LatchAddOperationResponse) OperationId() string {
+	return l.Data.OperationId
+}
+
 func (l *LatchStatusResponse) GetParentOperation() (operation LatchOperationStatus) {
 	for _, operation = range l.Data.Operations {
 		break
