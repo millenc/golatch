@@ -10,9 +10,9 @@ import (
 //Example request with dummy data used on the following tests
 var example_date = time.Date(2015, time.February, 15, 14, 53, 0, 0, time.UTC) //2015-02-15 14:53:00
 var example_request = &LatchRequest{AppID: "MyAppID",
-	SecretKey:   "MySecretKey",
-	HttpMethod:  "POST",
-	QueryString: "/api/0.9/pair/my_token",
+	SecretKey:  "MySecretKey",
+	HttpMethod: "POST",
+	URL:        GetLatchURL("pair/my_token"),
 	XHeaders: map[string]string{
 		"X-11paths-B": "Test value",
 		"X-11paths-A": "Line\nBreaks",
@@ -35,12 +35,12 @@ var example_expected_signature = "POST\n" +
 var example_expected_header = "11PATHS MyAppID dEjOhFT+gdVCcBtm2LeMf4+qey8="
 
 func TestNewLatchRequest(t *testing.T) {
-	got_request := NewLatchRequest(example_request.AppID, example_request.SecretKey, example_request.HttpMethod, example_request.QueryString, example_request.XHeaders, example_request.Params, example_date)
+	got_request := NewLatchRequest(example_request.AppID, example_request.SecretKey, example_request.HttpMethod, example_request.URL, example_request.XHeaders, example_request.Params, example_date)
 
 	if example_request.AppID != got_request.AppID ||
 		example_request.SecretKey != got_request.SecretKey ||
 		example_request.HttpMethod != got_request.HttpMethod ||
-		example_request.QueryString != got_request.QueryString ||
+		!reflect.DeepEqual(example_request.URL, got_request.URL) ||
 		!reflect.DeepEqual(example_request.XHeaders, got_request.XHeaders) ||
 		!reflect.DeepEqual(example_request.Params, got_request.Params) ||
 		example_request.Date != got_request.Date {

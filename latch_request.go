@@ -15,25 +15,25 @@ import (
 )
 
 type LatchRequest struct {
-	AppID       string
-	SecretKey   string
-	HttpMethod  string
-	QueryString string
-	XHeaders    map[string]string
-	Params      url.Values
-	Date        time.Time
+	AppID      string
+	SecretKey  string
+	HttpMethod string
+	URL        *url.URL
+	XHeaders   map[string]string
+	Params     url.Values
+	Date       time.Time
 }
 
 //Returns a new LatchRequest initialized with the parameters provided
-func NewLatchRequest(appID string, secretKey string, httpMethod string, queryString string, xHeaders map[string]string, params url.Values, date time.Time) *LatchRequest {
+func NewLatchRequest(appID string, secretKey string, httpMethod string, url *url.URL, xHeaders map[string]string, params url.Values, date time.Time) *LatchRequest {
 	return &LatchRequest{
-		AppID:       appID,
-		SecretKey:   secretKey,
-		HttpMethod:  httpMethod,
-		QueryString: queryString,
-		XHeaders:    xHeaders,
-		Params:      params,
-		Date:        date,
+		AppID:      appID,
+		SecretKey:  secretKey,
+		HttpMethod: httpMethod,
+		URL:        url,
+		XHeaders:   xHeaders,
+		Params:     params,
+		Date:       date,
 	}
 }
 
@@ -74,7 +74,7 @@ func (l *LatchRequest) GetRequestSignature() string {
 	buffer.WriteString("\n")
 	buffer.WriteString(l.GetSerializedHeaders())
 	buffer.WriteString("\n")
-	buffer.WriteString(l.QueryString)
+	buffer.WriteString(l.URL.RequestURI())
 	if l.HttpMethod == HTTP_METHOD_POST || l.HttpMethod == HTTP_METHOD_PUT {
 		buffer.WriteString("\n")
 		buffer.WriteString(l.GetSerializedParams())
@@ -143,7 +143,7 @@ func (l *LatchRequest) GetHttpRequest() *http.Request {
 	}
 
 	//TODO: Get the URL from the LatchRequest?
-	request, _ := http.NewRequest(l.HttpMethod, fmt.Sprint(API_URL, l.QueryString), body)
+	request, _ := http.NewRequest(l.HttpMethod, l.URL.String(), body)
 
 	//Set Headers
 	headers := l.GetAuthenticationHeaders()

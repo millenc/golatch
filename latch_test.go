@@ -13,10 +13,10 @@ func TestNewLatch(t *testing.T) {
 	}
 }
 
-func TestGetLatchQueryString(t *testing.T) {
-	expected := "/api/0.9/pair/my_token"
+func TestGetLatchURL(t *testing.T) {
+	expected_url := "https://latch.elevenpaths.com/api/0.9/pair/my_token"
 
-	if got := GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", "my_token")); got != expected {
-		t.Errorf("GetLatchQueryString() failed: expected %q, got %q", expected, got)
+	if got_url := GetLatchURL(fmt.Sprint(API_PAIR_ACTION, "/", "my_token")); got_url.String() != "https://latch.elevenpaths.com/api/0.9/pair/my_token" {
+		t.Errorf("GetLatchURL() failed: expected %q, got %q", expected_url, got_url)
 	}
 }
