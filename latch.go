@@ -39,6 +39,10 @@ const (
 	DISABLED  = "DISABLED"
 	NOT_SET   = ""
 
+	//Possible status values for the latch
+	LATCH_STATUS_ON  = "on"
+	LATCH_STATUS_OFF = "off"
+
 	//HTTP methods
 	HTTP_METHOD_POST   = "POST"
 	HTTP_METHOD_GET    = "GET"

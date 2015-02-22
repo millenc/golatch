@@ -35,7 +35,7 @@ func TestLatchStatusResponseUnmarshal(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("LatchStatusResponse.Unmarshal() failed json: json: %q , error %q", json, err)
-	} else if response.Status() != "on" {
+	} else if response.Status() != LATCH_STATUS_ON {
 		t.Errorf("LatchStatusResponse.Unmarshal() failed, expected on status: json: %q , got %q", json, response)
 	} else if two_factor := response.TwoFactor(); two_factor.Token != "MyToken" || two_factor.Generated != "GeneratedTime" {
 		t.Errorf("LatchStatusResponse.Unmarshal() failed, two factor data is wrong: json: %q , got %q", json, response)
@@ -52,7 +52,7 @@ func TestLatchStatusResponseUnmarshal(t *testing.T) {
 	for key, operation = range operations {
 		break
 	}
-	if key != "MyOperationID" || operation.Status != "on" {
+	if key != "MyOperationID" || operation.Status != LATCH_STATUS_ON {
 		t.Errorf("LatchStatusResponse.Unmarshal() failed, expected 1 operation with ID %q and status %q: json: %q , got %q", "MyOperationID", "on", json, response)
 		return
 	}
