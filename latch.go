@@ -47,34 +47,22 @@ const (
 )
 
 type Latch struct {
-	appID     string
-	secretKey string
+	AppID     string
+	SecretKey string
 }
 
-//Gets the Application ID
-func (l *Latch) AppID() string {
-	return l.appID
-}
-
-//Sets the Application ID
-func (l *Latch) SetAppID(appID string) {
-	l.appID = appID
-}
-
-//Gets the Secret Key
-func (l *Latch) SecretKey() string {
-	return l.secretKey
-}
-
-//Sets the Secret Key
-func (l *Latch) SetSecretKey(secretKey string) {
-	l.secretKey = secretKey
+//Constructs a new Latch struct
+func NewLatch(appID string, secretKey string) *Latch {
+	return &Latch{
+		AppID:     appID,
+		SecretKey: secretKey,
+	}
 }
 
 //Pairs an account with the provided pairing token
 func (l *Latch) Pair(token string) (response *LatchPairResponse, err error) {
 	var resp *LatchResponse
-	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now()), &LatchPairResponse{}); err == nil {
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_PAIR_ACTION, "/", token)), nil, nil, t.Now()), &LatchPairResponse{}); err == nil {
 		response = (*resp).(*LatchPairResponse)
 	}
 	return response, err
@@ -82,31 +70,31 @@ func (l *Latch) Pair(token string) (response *LatchPairResponse, err error) {
 
 //Unpairs an account, given it's account ID
 func (l *Latch) Unpair(accountId string) (err error) {
-	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNPAIR_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
+	_, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNPAIR_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
 	return err
 }
 
 //Locks an account, given it's account ID
 func (l *Latch) Lock(accountId string) (err error) {
-	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_LOCK_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
+	_, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_LOCK_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
 	return err
 }
 
 //Unlocks an account, given it's account ID
 func (l *Latch) Unlock(accountId string) (err error) {
-	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNLOCK_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
+	_, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNLOCK_ACTION, "/", accountId)), nil, nil, t.Now()), nil)
 	return err
 }
 
 //Locks an operation, given it's account ID and oeration ID
 func (l *Latch) LockOperation(accountId string, operationId string) (err error) {
-	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_LOCK_ACTION, "/", accountId, "/op/", operationId)), nil, nil, t.Now()), nil)
+	_, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_LOCK_ACTION, "/", accountId, "/op/", operationId)), nil, nil, t.Now()), nil)
 	return err
 }
 
 //Unlocks an operation, given it's account ID and oeration ID
 func (l *Latch) UnlockOperation(accountId string, operationId string) (err error) {
-	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNLOCK_ACTION, "/", accountId, "/op/", operationId)), nil, nil, t.Now()), nil)
+	_, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_UNLOCK_ACTION, "/", accountId, "/op/", operationId)), nil, nil, t.Now()), nil)
 	return err
 }
 
@@ -120,7 +108,7 @@ func (l *Latch) AddOperation(parentId string, name string, twoFactor string, loc
 	params.Set("two_factor", twoFactor)
 	params.Set("lock_on_request", lockOnRequest)
 
-	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_PUT, GetLatchQueryString(API_OPERATION_ACTION), nil, params, t.Now()), &LatchAddOperationResponse{}); err == nil {
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_PUT, GetLatchQueryString(API_OPERATION_ACTION), nil, params, t.Now()), &LatchAddOperationResponse{}); err == nil {
 		response = (*resp).(*LatchAddOperationResponse)
 	}
 	return response, err
@@ -137,13 +125,13 @@ func (l *Latch) UpdateOperation(operationId string, name string, twoFactor strin
 		params.Set("lock_on_request", lockOnRequest)
 	}
 
-	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_POST, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, params, t.Now()), nil)
+	_, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_POST, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, params, t.Now()), nil)
 	return err
 }
 
 //Deletes an existing operation
 func (l *Latch) DeleteOperation(operationId string) (err error) {
-	_, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_DELETE, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, nil, t.Now()), nil)
+	_, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_DELETE, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, nil, t.Now()), nil)
 	return err
 }
 
@@ -151,7 +139,7 @@ func (l *Latch) DeleteOperation(operationId string) (err error) {
 func (l *Latch) ShowOperation(operationId string) (response *LatchShowOperationResponse, err error) {
 	var resp *LatchResponse
 
-	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, nil, t.Now()), &LatchShowOperationResponse{}); err == nil {
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, nil, t.Now()), &LatchShowOperationResponse{}); err == nil {
 		response = (*resp).(*LatchShowOperationResponse)
 	}
 	return response, err
@@ -183,7 +171,7 @@ func (l *Latch) OperationStatus(accountId string, operationId string, nootp bool
 //Returns a LatchStatusResponse struct on success
 func (l *Latch) StatusRequest(query string) (response *LatchStatusResponse, err error) {
 	var resp *LatchResponse
-	if resp, err = l.DoRequest(NewLatchRequest(l.AppID(), l.SecretKey(), HTTP_METHOD_GET, GetLatchQueryString(query), nil, nil, t.Now()), &LatchStatusResponse{}); err == nil {
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchQueryString(query), nil, nil, t.Now()), &LatchStatusResponse{}); err == nil {
 		response = (*resp).(*LatchStatusResponse)
 	}
 	return response, err

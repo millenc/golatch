@@ -5,23 +5,11 @@ import (
 	"testing"
 )
 
-func TestSetAppID(t *testing.T) {
-	l := &Latch{}
-	appID := "MyAppID"
+func TestNewLatch(t *testing.T) {
+	latch := NewLatch("MyAppID", "MySecretKey")
 
-	l.SetAppID(appID)
-	if l.AppID() != appID {
-		t.Errorf("SetAppID()/AppID() failed: expected %q, got %q", appID, l.AppID())
-	}
-}
-
-func TestSetSecretKey(t *testing.T) {
-	l := &Latch{}
-	secretKey := "MySecretKey"
-
-	l.SetSecretKey(secretKey)
-	if l.SecretKey() != secretKey {
-		t.Errorf("SetSecretKey()/SecretKey() failed: expected %q, got %q", secretKey, l.SecretKey())
+	if latch.AppID != "MyAppID" || latch.SecretKey != "MySecretKey" {
+		t.Errorf("NewLatch() failed: expected (%q,%q), got (%q,%q)", "MyAppID", "MySecretKey", latch.AppID, latch.SecretKey)
 	}
 }
 
