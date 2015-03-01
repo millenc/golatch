@@ -2,7 +2,6 @@ package golatch
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type LatchResponse interface {
@@ -33,7 +32,7 @@ type LatchOperationStatus struct {
 
 type LatchTwoFactor struct {
 	Token     string `json:"token"`
-	Generated string `json:"generated"`
+	Generated uint64 `json:"generated"`
 }
 
 type LatchAddOperationResponse struct {
@@ -55,6 +54,10 @@ type LatchOperation struct {
 	Operations    map[string]LatchOperation `json:"operations"`
 }
 
+type LatchHistoryResponse struct {
+	Data map[string]interface{} `json:"data"`
+}
+
 func (l *LatchErrorResponse) Unmarshal(Json string) error {
 	return json.Unmarshal([]byte(Json), l)
 }
@@ -72,7 +75,10 @@ func (l *LatchAddOperationResponse) Unmarshal(Json string) (err error) {
 }
 
 func (l *LatchShowOperationResponse) Unmarshal(Json string) (err error) {
-	fmt.Println(Json)
+	return json.Unmarshal([]byte(Json), l)
+}
+
+func (l *LatchHistoryResponse) Unmarshal(Json string) (err error) {
 	return json.Unmarshal([]byte(Json), l)
 }
 
