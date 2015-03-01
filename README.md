@@ -1,4 +1,4 @@
-#golatch
+#golatch [![Build Status](https://travis-ci.org/millenc/golatch.svg?branch=master)](https://travis-ci.org/millenc/golatch)
 
 **golatch** is a package that easily lets you integrate [Latch](https://latch.elevenpaths.com/) in your [Go](https://golang.org/) applications. If you don't know what Latch is or how to use it please visit their [official site](https://latch.elevenpaths.com/).
 
