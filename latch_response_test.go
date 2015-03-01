@@ -29,7 +29,7 @@ func TestLatchPairResponseUnmarshal(t *testing.T) {
 }
 
 func TestLatchStatusResponseUnmarshal(t *testing.T) {
-	json := `{"data":{"operations":{"MyApplicationID":{"status":"on", "two_factor":{"token":"MyToken", "generated":"GeneratedTime"},"operations":{"MyOperationID":{"status":"on"}}}}}}`
+	json := `{"data":{"operations":{"MyApplicationID":{"status":"on", "two_factor":{"token":"g2sEXg","generated":1425209705208},"operations":{"MyOperationID":{"status":"on"}}}}}}`
 	response := &LatchStatusResponse{}
 	err := response.Unmarshal(json)
 
@@ -37,7 +37,7 @@ func TestLatchStatusResponseUnmarshal(t *testing.T) {
 		t.Errorf("LatchStatusResponse.Unmarshal() failed json: json: %q , error %q", json, err)
 	} else if response.Status() != LATCH_STATUS_ON {
 		t.Errorf("LatchStatusResponse.Unmarshal() failed, expected on status: json: %q , got %q", json, response)
-	} else if two_factor := response.TwoFactor(); two_factor.Token != "MyToken" || two_factor.Generated != "GeneratedTime" {
+	} else if two_factor := response.TwoFactor(); two_factor.Token != "g2sEXg" || two_factor.Generated != 1425209705208 {
 		t.Errorf("LatchStatusResponse.Unmarshal() failed, two factor data is wrong: json: %q , got %q", json, response)
 	}
 
