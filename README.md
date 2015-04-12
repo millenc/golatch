@@ -181,8 +181,49 @@ if response, err := latch.ShowOperation(operationId); err == nil {
 }
 ```
 
-##Tests
+### History
 
+*NOTE*: This method require a GOLD or PLATINUM subscription in order to work. If you don't have any of these types of subscriptions you will get an error.
+
+You can get the history of an account (with it's `accountId`) between two dates (`from` and `to`) with the `History()` method:
+
+``` go
+if response, err := latch.History(accountId, from, to); err == nil {
+	application := response.Application()
+	lastSeen := response.LastSeen()
+	clientVersion := response.ClientVersion()
+	historyCount := response.HistoryCount()
+	history := response.History()	
+}
+```
+once you have a response, you can use the following methods to get the information contained in it:
+
+* `Application()`: returns a struct of type `LatchApplication` with information about the application. This struct has the following fields:
+	* `Status`: status of the application (on/off).
+	* `PairedOn`: when the account was paired to the application.
+	* `Name`: name of the application.
+	* `Description`: description of the application.
+	* `ImageURL`: URL of the application's image.
+	* `ContactPhone`: contact phone of the application's administrator.
+	* `ContactEmail`: contact email of the application's administrator.
+	* `TwoFactor`: two factor setting.
+	* `LockOnRequest`: lock on request setting.
+	* `Operations`: array of LatchOperation structs containing information about the operations defined for the application.
+* `LastSeen()`: last time there was user activity for this account.
+* `ClientVersion()`: map containing information about clients (key) and versions (value) used by the user.
+* `HistoryCount()`: number of history entries in the response.
+* `History()`: history entries. Array of structs of type `LatchHistoryEntry`:
+	* `Time`: time of this action.
+	* `Action`: action (get,USER_UPDATE or DEVELOPER_UPDATE)
+	* `What`: parameter that was affected by the action.
+	* `Was`: previous value of the parameter.
+	* `Value`: value of the parameter.
+	* `Name`: name of the application or operation.
+	* `UserAgent`: user agent of the user that performed the action.
+	* `IP`: ip of the user that performed the action.
+
+##Tests
+ 
 You can run unit tests for this package using:
 
 ``` bash

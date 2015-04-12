@@ -93,3 +93,65 @@ func TestLatchShowOperationResponseUnmarshal(t *testing.T) {
 		t.Errorf("LatchShowOperationResponse.Unmarshal() failed: expected nested operation:%q with name %q, got %q with name %q", "MyNestedOperationID", "My Nested Operation", nested_operation_id, nested_operation.Name)
 	}
 }
+
+func TestLatchHistoryResponseUnmarshal(t *testing.T) {
+	json := `{"data":{"2Wv8UqaT6iZRQEbyG9Kv":{"status":"on","pairedOn":1428528090941,"name":"GoLatch Test","description":"","imageURL":"https://s3-eu-west-1.amazonaws.com/latch-ireland/avatar1.jpg","contactPhone":"666111222","contactEmail":"","two_factor":"DISABLED","lock_on_request":"DISABLED","operations":{"wJrfCBzZCtiZfVFwt9aJ":{"name":"Operation 1","status":"on","two_factor":"off","lock_on_request":"off","operations":{}}}},"lastSeen":1428858456785,"clientVersion":{"Android":"1.4.1"},"count":5,"history":[{"t":1428528254424,"action":"get","what":"status","value":"on","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"},{"t":1428528260264,"action":"USER_UPDATE","what":"status","value":"off","was":"on","name":"GoLatch Test","userAgent":"","ip":"127.0.0.1"},{"t":1428528264520,"action":"get","what":"status","value":"off","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"},{"t":1428528274326,"action":"USER_UPDATE","what":"status","value":"on","was":"off","name":"GoLatch Test","userAgent":"","ip":"127.0.0.1"},{"t":1428528277313,"action":"get","what":"status","value":"on","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"}]}}`
+	response := &LatchHistoryResponse{AppID: "2Wv8UqaT6iZRQEbyG9Kv"}
+
+	err := response.Unmarshal(json)
+
+	if err != nil {
+		t.Errorf("LatchHistoryResponse.Unmarshal() failed json: %q , error %q", json, err)
+	}
+
+	application := response.Application()
+	operations := application.Operations
+	lastSeen := response.LastSeen()
+	clientVersion := response.ClientVersion()
+	historyCount := response.HistoryCount()
+	history := response.History()
+
+	//Test application data
+	if application.Status != "on" ||
+		application.PairedOn != 1428528090941 ||
+		application.Name != "GoLatch Test" ||
+		application.Description != "" ||
+		application.ImageURL != "https://s3-eu-west-1.amazonaws.com/latch-ireland/avatar1.jpg" ||
+		application.ContactPhone != "666111222" ||
+		application.ContactEmail != "" ||
+		application.TwoFactor != DISABLED ||
+		application.LockOnRequest != DISABLED {
+		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect application data json: %s , object %s", json, response)
+	}
+	if operation := operations["wJrfCBzZCtiZfVFwt9aJ"]; len(operations) != 1 ||
+		operation.Name != "Operation 1" ||
+		operation.Status != "on" ||
+		operation.LockOnRequest != "off" ||
+		operation.TwoFactor != "off" {
+		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect operations data json: %s , object %s", json, response)
+	}
+
+	//Test LastSeen
+	if lastSeen != 1428858456785 {
+		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect lastSeen data json: %s , object %s", json, response)
+	}
+
+	//Test Client Version
+	if client := clientVersion["Android"]; len(clientVersion) != 1 || client != "1.4.1" {
+		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect clientVersion data json: %s , object %s", json, response)
+	}
+
+	//Test History
+	if historyCount != 5 || len(history) != 5 {
+		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect history data json: %s , object %s", json, response)
+	} else if firstHistoryEntry := history[0]; firstHistoryEntry.Time != 1428528254424 ||
+		firstHistoryEntry.Action != "get" ||
+		firstHistoryEntry.What != "status" ||
+		firstHistoryEntry.Value != "on" ||
+		firstHistoryEntry.Was != "-" ||
+		firstHistoryEntry.Name != "GoLatch Test" ||
+		firstHistoryEntry.UserAgent != "Go 1.1 package http" ||
+		firstHistoryEntry.IP != "127.0.0.1" {
+		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect history entry data json: %s , object %s", json, response)
+	}
+}

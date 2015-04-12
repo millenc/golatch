@@ -2,6 +2,8 @@ package golatch
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 )
 
 type LatchResponse interface {
@@ -49,13 +51,45 @@ type LatchShowOperationResponse struct {
 
 type LatchOperation struct {
 	Name          string                    `json:"name"`
+	Status        string                    `json:"status"`
 	TwoFactor     string                    `json:"two_factor"`
 	LockOnRequest string                    `json:"lock_on_request"`
 	Operations    map[string]LatchOperation `json:"operations"`
 }
 
 type LatchHistoryResponse struct {
-	Data map[string]interface{} `json:"data"`
+	AppID string
+	Data  struct {
+		Application   LatchApplication    `json:"application"`
+		LastSeen      uint64              `json:"lastSeen"`
+		ClientVersion map[string]string   `json:"clientVersion"`
+		HistoryCount  int                 `json:"count"`
+		History       []LatchHistoryEntry `json:"history"`
+	} `json:"data"`
+}
+
+type LatchApplication struct {
+	Status        string                    `json:"status"`
+	PairedOn      uint64                    `json:"pairedOn"`
+	Name          string                    `json:"name"`
+	Description   string                    `json:"description"`
+	ImageURL      string                    `json:"imageURL"`
+	ContactPhone  string                    `json:"contactPhone"`
+	ContactEmail  string                    `json:"contactEmail"`
+	TwoFactor     string                    `json:"two_factor"`
+	LockOnRequest string                    `json:"lock_on_request"`
+	Operations    map[string]LatchOperation `json:"operations"`
+}
+
+type LatchHistoryEntry struct {
+	Time      uint64 `json:"t"`
+	Action    string `json:"action"`
+	What      string `json:"what"`
+	Value     string `json:"value"`
+	Was       string `json:"was"`
+	Name      string `json:"name"`
+	UserAgent string `json:"userAgent"`
+	IP        string `json:"ip"`
 }
 
 func (l *LatchErrorResponse) Unmarshal(Json string) error {
@@ -79,7 +113,8 @@ func (l *LatchShowOperationResponse) Unmarshal(Json string) (err error) {
 }
 
 func (l *LatchHistoryResponse) Unmarshal(Json string) (err error) {
-	return json.Unmarshal([]byte(Json), l)
+	fmt.Println(Json)
+	return json.Unmarshal([]byte(strings.Replace(Json, l.AppID, "application", 1)), l)
 }
 
 func (l *LatchPairResponse) AccountId() string {
@@ -114,4 +149,24 @@ func (l *LatchShowOperationResponse) Operation() (operation LatchOperation) {
 		break
 	}
 	return
+}
+
+func (l *LatchHistoryResponse) Application() LatchApplication {
+	return l.Data.Application
+}
+
+func (l *LatchHistoryResponse) LastSeen() uint64 {
+	return l.Data.LastSeen
+}
+
+func (l *LatchHistoryResponse) ClientVersion() map[string]string {
+	return l.Data.ClientVersion
+}
+
+func (l *LatchHistoryResponse) HistoryCount() int {
+	return l.Data.HistoryCount
+}
+
+func (l *LatchHistoryResponse) History() []LatchHistoryEntry {
+	return l.Data.History
 }

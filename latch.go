@@ -185,7 +185,7 @@ func (l *Latch) StatusRequest(query string) (response *LatchStatusResponse, err 
 func (l *Latch) History(accountId string, from t.Time, to t.Time) (response *LatchHistoryResponse, err error) {
 	var resp *LatchResponse
 
-	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchURL(fmt.Sprintf("%s/%s/%d/%d", API_HISTORY_ACTION, accountId, from.UnixNano()/1000000, to.UnixNano()/1000000)), nil, nil, t.Now()), &LatchHistoryResponse{}); err == nil {
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchURL(fmt.Sprintf("%s/%s/%d/%d", API_HISTORY_ACTION, accountId, from.UnixNano()/1000000, to.UnixNano()/1000000)), nil, nil, t.Now()), &LatchHistoryResponse{AppID: l.AppID}); err == nil {
 		response = (*resp).(*LatchHistoryResponse)
 	}
 	return response, err
