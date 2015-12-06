@@ -139,11 +139,17 @@ func (l *Latch) DeleteOperation(operationId string) (err error) {
 	return err
 }
 
-//Shows operation
+//Shows operations information
+//If operationId is empty this function will retrieve all the operations of the app
 func (l *Latch) ShowOperation(operationId string) (response *LatchShowOperationResponse, err error) {
 	var resp *LatchResponse
+	var operation string
 
-	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchURL(fmt.Sprint(API_OPERATION_ACTION, "/", operationId)), nil, nil, t.Now()), &LatchShowOperationResponse{}); err == nil {
+	if operationId != "" {
+		operation += "/" + operationId
+	}
+
+	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchURL(fmt.Sprint(API_OPERATION_ACTION, operation)), nil, nil, t.Now()), &LatchShowOperationResponse{}); err == nil {
 		response = (*resp).(*LatchShowOperationResponse)
 	}
 	return response, err

@@ -142,8 +142,12 @@ func (l *LatchStatusResponse) Operations() map[string]LatchOperationStatus {
 	return l.GetParentOperation().Operations
 }
 
-func (l *LatchShowOperationResponse) Operation() (operation LatchOperation) {
-	for _, operation = range l.Data.Operations {
+func (l *LatchShowOperationResponse) Operations() (operations map[string]LatchOperation) {
+	return l.Data.Operations
+}
+
+func (l *LatchShowOperationResponse) FirstOperation() (operationId string, operation LatchOperation) {
+	for operationId, operation = range l.Data.Operations {
 		break
 	}
 	return
