@@ -75,11 +75,11 @@ err := latch.UnlockOperation("AccountID", "MyOperationID")
 To get the current status of an account, you can use the `Status()` method:
 
 ``` go
-if response, err := latch.Status("AccountID", false); err == nil {
+if response, err := latch.Status("AccountID", false, false); err == nil {
 	//Handle response
 }
 ```
-Upon success, this method will return a `response` struct of type `LatchStatusResponse`. If the second parameter is `true`, then no One-time password information will be included in the response. You can easily access the information for the root application/operation:
+Upon success, this method will return a `response` struct of type `LatchStatusResponse`. If the second parameter is `true` (nootp), then the One-time password information will not be included in the response. If the third parameter is `true` (silent) Latch will not send a push notification to the user alerting of the access if the account's latch is on (this requires a SILVER, GOLD or PLATINUM subscription). You can easily access the information for the root application/operation:
 
 **`Status()`**: Gets the account status:
 
@@ -122,11 +122,11 @@ The information contained in these fields is the same that has been previously d
 **IMPORTANT**: If you have created operations for your application you should not query the status of the application, but rather the status of individual operations. To do so, you can use the `OperationStatus()` method:
 
 ``` go
-if response, err := latch.OperationStatus("AccountID", "MyOperationID", false); err == nil {
+if response, err := latch.OperationStatus("AccountID", "MyOperationID", false, false); err == nil {
     //Handle response
 }
 ```
-If the third parameter is `true`, then no One-time password information will be included in the response. The response is of the same type and contains the same information as the one returned by the `Status()` method.
+If the third parameter is `true` (nootp), then no One-time password information will be included in the response. If the fourth parameter is `true` (silent) Latch will not send a push notification to the user alerting of the access if the operation's latch is on (this requires a SILVER, GOLD or PLATINUM subscription). The response is of the same type and contains the same information as the one returned by the `Status()` method.
 
 ###Managing operations
 
