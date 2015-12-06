@@ -14,7 +14,7 @@ const (
 	//Latch related constants
 	API_URL                                  = "https://latch.elevenpaths.com"
 	API_PATH                                 = "/api"
-	API_VERSION                              = "0.9"
+	API_VERSION                              = "1.0"
 	API_CHECK_STATUS_ACTION                  = "status"
 	API_PAIR_ACTION                          = "pair"
 	API_PAIR_WITH_ID_ACTION                  = "pairWithId"
@@ -151,10 +151,14 @@ func (l *Latch) ShowOperation(operationId string) (response *LatchShowOperationR
 
 //Gets the status of an account, given it's account ID
 //If nootp is true, the one time password won't be included in the response
-func (l *Latch) Status(accountId string, nootp bool) (response *LatchStatusResponse, err error) {
+//If silent is true Latch will not send push notifications to the client (requires SILVER, GOLD or PLATINUM subscription)
+func (l *Latch) Status(accountId string, nootp bool, silent bool) (response *LatchStatusResponse, err error) {
 	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId)
 	if nootp {
 		query = fmt.Sprint(query, "/nootp")
+	}
+	if silent {
+		query = fmt.Sprint(query, "/silent")
 	}
 
 	return l.StatusRequest(query)
@@ -162,10 +166,14 @@ func (l *Latch) Status(accountId string, nootp bool) (response *LatchStatusRespo
 
 //Gets the status of an operation, given it's account ID and operation ID
 //If nootp is true, the one time password won't be included in the response
-func (l *Latch) OperationStatus(accountId string, operationId string, nootp bool) (response *LatchStatusResponse, err error) {
+//If silent is true Latch will not send push notifications to the client (requires SILVER, GOLD or PLATINUM subscription)
+func (l *Latch) OperationStatus(accountId string, operationId string, nootp bool, silent bool) (response *LatchStatusResponse, err error) {
 	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId, "/op/", operationId)
 	if nootp {
 		query = fmt.Sprint(query, "/nootp")
+	}
+	if silent {
+		query = fmt.Sprint(query, "/silent")
 	}
 
 	return l.StatusRequest(query)

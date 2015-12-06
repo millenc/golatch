@@ -2,7 +2,6 @@ package golatch
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 )
 
@@ -113,7 +112,6 @@ func (l *LatchShowOperationResponse) Unmarshal(Json string) (err error) {
 }
 
 func (l *LatchHistoryResponse) Unmarshal(Json string) (err error) {
-	fmt.Println(Json)
 	return json.Unmarshal([]byte(strings.Replace(Json, l.AppID, "application", 1)), l)
 }
 

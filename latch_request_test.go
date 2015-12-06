@@ -30,9 +30,9 @@ var example_expected_serialized_params = "A=A&B=A&B=B"
 var example_expected_signature = "POST\n" +
 	example_expected_formatted_date + "\n" +
 	example_expected_serialized_headers + "\n" +
-	"/api/0.9/pair/my_token\n" +
+	"/api/1.0/pair/my_token\n" +
 	example_expected_serialized_params
-var example_expected_header = "11PATHS MyAppID dEjOhFT+gdVCcBtm2LeMf4+qey8="
+var example_expected_header = "11PATHS MyAppID XOxtWhv576pq8w7VAC8EoxN3SPo="
 
 func TestNewLatchRequest(t *testing.T) {
 	got_request := NewLatchRequest(example_request.AppID, example_request.SecretKey, example_request.HttpMethod, example_request.URL, example_request.XHeaders, example_request.Params, example_date)
@@ -108,8 +108,8 @@ func TestGetHttpRequest(t *testing.T) {
 	if got_request.Method != example_request.HttpMethod {
 		t.Errorf("GetHttpRequest() failed: expected HTTP Method %q, got %q", example_request.HttpMethod, got_request.Method)
 	}
-	if got_request.URL.String() != "https://latch.elevenpaths.com/api/0.9/pair/my_token" {
-		t.Errorf("GetHttpRequest() failed: expected URL %q, got %q", "https://latch.elevenpaths.com/api/0.9/pair/my_token", got_request.URL.String())
+	if got_request.URL.String() != "https://latch.elevenpaths.com/api/1.0/pair/my_token" {
+		t.Errorf("GetHttpRequest() failed: expected URL %q, got %q", "https://latch.elevenpaths.com/api/1.0/pair/my_token", got_request.URL.String())
 	}
 	if got_request.Header.Get(API_AUTHORIZATION_HEADER_NAME) != example_request.GetAuthorizationHeader() {
 		t.Errorf("GetHttpRequest() failed: expected Authorization header %q, got %q", got_request.Header.Get(API_AUTHORIZATION_HEADER_NAME), example_request.GetAuthorizationHeader())
