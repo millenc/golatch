@@ -170,9 +170,24 @@ err := DeleteOperation(operationId)
 
 **Get operation information**:
 
+Get all the operations:
+
+``` go
+if response, err := latch.ShowOperation(""); err == nil {
+	for id, operation := range response.Operations() {
+		name := operation.Name
+		two_factor := operation.TwoFactor
+		lock_on_request := operation.LockOnRequest
+		operations := operation.Operations
+	}
+}
+```
+
+Get single operation (using it's operation ID):
+
 ``` go
 if response, err := latch.ShowOperation(operationId); err == nil {
-	operation := response.Operation()
+	id, operation := response.FirstOperation()
 	
 	name := operation.Name
 	two_factor := operation.TwoFactor
