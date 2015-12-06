@@ -78,8 +78,8 @@ func TestLatchShowOperationResponseUnmarshal(t *testing.T) {
 	if err != nil {
 		t.Errorf("LatchShowOperationResponse.Unmarshal() failed json: %q , error %q", json, err)
 	}
-	operation := response.FirstOperation()
-	if operation.Name != "My Operation" || operation.TwoFactor != MANDATORY || operation.LockOnRequest != OPT_IN || len(operation.Operations) == 0 {
+	id, operation := response.FirstOperation()
+	if id != "MyOperationId" || operation.Name != "My Operation" || operation.TwoFactor != MANDATORY || operation.LockOnRequest != OPT_IN || len(operation.Operations) == 0 {
 		t.Errorf("LatchShowOperationResponse.Unmarshal() failed: expected:%q,%q,%q,%d and got %q,%q,%q,%d", "My Operation", MANDATORY, OPT_IN, 1, operation.Name, operation.TwoFactor, operation.LockOnRequest, len(operation.Operations))
 	}
 
