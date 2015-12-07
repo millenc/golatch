@@ -53,6 +53,7 @@ const (
 type Latch struct {
 	AppID     string
 	SecretKey string
+	Proxy     *url.URL
 }
 
 //Constructs a new Latch struct
@@ -206,12 +207,18 @@ func (l *Latch) History(accountId string, from t.Time, to t.Time) (response *Lat
 }
 
 func (l *Latch) DoRequest(request *LatchRequest, responseType LatchResponse) (response *LatchResponse, err error) {
-	client := &http.Client{}
-	req := request.GetHttpRequest()
+	var client *http.Client
 	var resp *http.Response
 	var body []byte
 
+	//Initialize the client
+	client = &http.Client{}
+	if l.Proxy != nil {
+		client.Transport = &http.Transport{Proxy: http.ProxyURL(l.Proxy)}
+	}
+
 	//Perform the request
+	req := request.GetHttpRequest()
 	if resp, err = client.Do(req); err != nil {
 		return
 	}
@@ -244,6 +251,11 @@ func (l *Latch) DoRequest(request *LatchRequest, responseType LatchResponse) (re
 	}
 
 	return response, err
+}
+
+//Sets the proxy URL to be used in all requests to the API
+func (l *Latch) SetProxy(proxyURL *url.URL) {
+	l.Proxy = proxyURL
 }
 
 //Gets the complete url for a request
