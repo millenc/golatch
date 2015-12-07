@@ -1,59 +1,15 @@
 package golatch
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	t "time"
-)
-
-const (
-	//Latch related constants
-	API_URL                                  = "https://latch.elevenpaths.com"
-	API_PATH                                 = "/api"
-	API_VERSION                              = "1.0"
-	API_CHECK_STATUS_ACTION                  = "status"
-	API_PAIR_ACTION                          = "pair"
-	API_PAIR_WITH_ID_ACTION                  = "pairWithId"
-	API_UNPAIR_ACTION                        = "unpair"
-	API_LOCK_ACTION                          = "lock"
-	API_UNLOCK_ACTION                        = "unlock"
-	API_HISTORY_ACTION                       = "history"
-	API_OPERATION_ACTION                     = "operation"
-	API_NOOTP_SUFFIX                         = "nootp"
-	API_AUTHENTICATION_METHOD                = "11PATHS"
-	API_AUTHORIZATION_HEADER_NAME            = "Authorization"
-	API_DATE_HEADER_NAME                     = "X-11Paths-Date"
-	API_AUTHORIZATION_HEADER_FIELD_SEPARATOR = " "
-	API_X_11PATHS_HEADER_PREFIX              = "X-11Paths-"
-	API_X_11PATHS_HEADER_SEPARATOR           = ":"
-	API_UTC_STRING_FORMAT                    = "2006-01-02 15:04:05" //format layout as defined here: http://golang.org/pkg/time/#pkg-constants
-
-	//Possible values for the Two factor and Lock on request options
-	//NOT_SET is used in the UpdateOperation() method to leave the existing value
-	MANDATORY = "MANDATORY"
-	OPT_IN    = "OPT_IN"
-	DISABLED  = "DISABLED"
-	NOT_SET   = ""
-
-	//Possible status values for the latch
-	LATCH_STATUS_ON  = "on"
-	LATCH_STATUS_OFF = "off"
-
-	//HTTP methods
-	HTTP_METHOD_POST   = "POST"
-	HTTP_METHOD_GET    = "GET"
-	HTTP_METHOD_PUT    = "PUT"
-	HTTP_METHOD_DELETE = "DELETE"
 )
 
 type Latch struct {
 	AppID     string
 	SecretKey string
-	Proxy     *url.URL
+	LatchAPI
 }
 
 //Constructs a new Latch struct
@@ -162,10 +118,10 @@ func (l *Latch) ShowOperation(operationId string) (response *LatchShowOperationR
 func (l *Latch) Status(accountId string, nootp bool, silent bool) (response *LatchStatusResponse, err error) {
 	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId)
 	if nootp {
-		query = fmt.Sprint(query, "/nootp")
+		query = fmt.Sprint(query, API_NOOTP_SUFFIX)
 	}
 	if silent {
-		query = fmt.Sprint(query, "/silent")
+		query = fmt.Sprint(query, API_SILENT_SUFFIX)
 	}
 
 	return l.StatusRequest(query)
@@ -177,10 +133,10 @@ func (l *Latch) Status(accountId string, nootp bool, silent bool) (response *Lat
 func (l *Latch) OperationStatus(accountId string, operationId string, nootp bool, silent bool) (response *LatchStatusResponse, err error) {
 	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId, "/op/", operationId)
 	if nootp {
-		query = fmt.Sprint(query, "/nootp")
+		query = fmt.Sprint(query, API_NOOTP_SUFFIX)
 	}
 	if silent {
-		query = fmt.Sprint(query, "/silent")
+		query = fmt.Sprint(query, API_SILENT_SUFFIX)
 	}
 
 	return l.StatusRequest(query)
@@ -204,66 +160,4 @@ func (l *Latch) History(accountId string, from t.Time, to t.Time) (response *Lat
 		response = (*resp).(*LatchHistoryResponse)
 	}
 	return response, err
-}
-
-func (l *Latch) DoRequest(request *LatchRequest, responseType LatchResponse) (response *LatchResponse, err error) {
-	var client *http.Client
-	var resp *http.Response
-	var body []byte
-
-	//Initialize the client
-	client = &http.Client{}
-	if l.Proxy != nil {
-		client.Transport = &http.Transport{Proxy: http.ProxyURL(l.Proxy)}
-	}
-
-	//Perform the request
-	req := request.GetHttpRequest()
-	if resp, err = client.Do(req); err != nil {
-		return
-	}
-
-	//Get the response's body
-	defer resp.Body.Close()
-	if body, err = ioutil.ReadAll(resp.Body); err != nil {
-		return
-	}
-
-	//Handle HTTP errors
-	if resp.StatusCode != 200 {
-		err = errors.New(fmt.Sprintf("HTTP error [%d] body: %s", resp.StatusCode, body))
-		return
-	}
-
-	//Check if the response is an error before decoding it
-	latch_error_response := &LatchErrorResponse{}
-	if err = json.Unmarshal(body, latch_error_response); err != nil {
-		return
-	} else if (*latch_error_response).Err.Code != 0 {
-		err = &latch_error_response.Err
-		return
-	}
-
-	//Decode response into a typed response (if one has been specified)
-	if responseType != nil {
-		err = responseType.Unmarshal(string(body))
-		response = &responseType
-	}
-
-	return response, err
-}
-
-//Sets the proxy URL to be used in all requests to the API
-func (l *Latch) SetProxy(proxyURL *url.URL) {
-	l.Proxy = proxyURL
-}
-
-//Gets the complete url for a request
-func GetLatchURL(queryString string) *url.URL {
-	latch_url, err := (&url.URL{}).Parse(fmt.Sprint(API_URL, API_PATH, "/", API_VERSION, "/", queryString))
-	if err != nil {
-		latch_url = &url.URL{}
-	}
-
-	return latch_url
 }
