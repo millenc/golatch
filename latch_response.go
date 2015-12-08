@@ -102,6 +102,13 @@ type LatchApplicationInfo struct {
 	Operations    map[string]LatchOperation `json:"operations"`
 }
 
+type LatchAddApplicationResponse struct {
+	Data struct {
+		AppID  string `json:"applicationId"`
+		Secret string `json:"secret"`
+	} `json:"data"`
+}
+
 func (l *LatchErrorResponse) Unmarshal(Json string) error {
 	return json.Unmarshal([]byte(Json), l)
 }
@@ -190,4 +197,16 @@ func (l *LatchShowApplicationsResponse) Unmarshal(Json string) (err error) {
 
 func (l *LatchShowApplicationsResponse) Applications() map[string]LatchApplicationInfo {
 	return l.Data.Applications
+}
+
+func (l *LatchAddApplicationResponse) Unmarshal(Json string) (err error) {
+	return json.Unmarshal([]byte(Json), l)
+}
+
+func (l *LatchAddApplicationResponse) AppID() string {
+	return l.Data.AppID
+}
+
+func (l *LatchAddApplicationResponse) Secret() string {
+	return l.Data.Secret
 }

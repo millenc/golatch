@@ -189,3 +189,19 @@ func TestLatchShowApplicationsResponseUnmarshal(t *testing.T) {
 		t.Errorf("LatchShowApplicationsResponse.Unmarshal() failed, incorrect history entry data json: %s , object %s", json, response)
 	}
 }
+
+func TestLatchAddApplicationResponseUnmarshal(t *testing.T) {
+	json := `{"data":{"applicationId":"TD6f4qVe4GYncDFCUaBn","secret":"HZVpPsEyCqZX6MGjC3d8pzkYNfvYKxu7fZFQZNrU"}}`
+
+	response := &LatchAddApplicationResponse{}
+	err := response.Unmarshal(json)
+
+	if err != nil {
+		t.Errorf("LatchAddApplicationResponse.Unmarshal() failed json: %q , error %q", json, err)
+	}
+
+	if response.AppID() != "TD6f4qVe4GYncDFCUaBn" ||
+		response.Secret() != "HZVpPsEyCqZX6MGjC3d8pzkYNfvYKxu7fZFQZNrU" {
+		t.Errorf("LatchAddApplicationResponse.Unmarshal() failed, json: %s , object %s", json, response)
+	}
+}

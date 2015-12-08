@@ -282,6 +282,27 @@ This call will return a struct of type `LatchShowApplicationsResponse`. You can 
 * `ImageURL`: Image URL
 * `Operations`: Map of `LatchOperation` structs with the application's operations.
 
+### Add application
+
+You can create a new application programatically using the `AddApplication()` method. You need to provide a `LatchApplicationInfo` struct with the application information like in the following example:
+
+``` go
+applicationInfo := &golatch.LatchApplicationInfo{
+	Name:          "My Application Name",
+	ContactEmail:  "my@contact_email.com",
+	ContactPhone:  "111222333",
+	TwoFactor:     golatch.DISABLED, //optional, can also be golatch.MANDATORY, golatch.OPT_IN or golatch.NOT_SET (empty)
+	LockOnRequest: golatch.OPT_IN,   //optional, same values as TwoFactor
+}
+
+if response, err := latch.AddApplication(applicationInfo); err == nil {
+	fmt.Println(response.AppID())
+	fmt.Println(response.Secret())
+}
+```
+
+If everything goes well, you can use the `AppID()` and `Secret()` methods on the response struct to get the Application ID and Secret Key of the new application.
+
 ### Delete an application
 
 You can delete an existing application using the `DeleteApplication()` function:
