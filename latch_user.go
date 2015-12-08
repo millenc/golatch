@@ -41,6 +41,15 @@ func (l *LatchUser) AddApplication(applicationInfo *LatchApplicationInfo) (respo
 	return response, err
 }
 
+//Updates application information
+func (l *LatchUser) UpdateApplication(appID string, applicationInfo *LatchApplicationInfo) (err error) {
+	params := prepareApplicationParams(applicationInfo)
+
+	_, err = l.DoRequest(NewLatchRequest(l.UserID, l.SecretKey, HTTP_METHOD_POST, GetLatchURL(fmt.Sprint(API_APPLICATION_ACTION, "/", appID)), nil, *params, t.Now()), nil)
+
+	return err
+}
+
 //Deletes an existing application
 func (l *LatchUser) DeleteApplication(applicationId string) (err error) {
 	_, err = l.DoRequest(NewLatchRequest(l.UserID, l.SecretKey, HTTP_METHOD_DELETE, GetLatchURL(fmt.Sprint(API_APPLICATION_ACTION, "/", applicationId)), nil, nil, t.Now()), nil)

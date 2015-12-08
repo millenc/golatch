@@ -303,6 +303,22 @@ if response, err := latch.AddApplication(applicationInfo); err == nil {
 
 If everything goes well, you can use the `AppID()` and `Secret()` methods on the response struct to get the Application ID and Secret Key of the new application.
 
+### Update application
+
+You can update the information of an existing application using the `UpdateApplication()` method. You must specify the Application's ID (first parameter) and the information you want to change (second parameter, which must be a struct of type `LatchApplicationInfo`). For example to change the name of the application you could this:
+
+``` go
+applicationInfo := &golatch.LatchApplicationInfo{
+	Name: "Modified Application Name",
+}
+
+if err := latch.UpdateApplication("ApplicationID here", applicationInfo); err != nil {
+	fmt.Println(err)
+}
+```
+
+Because of the way the API works, only non empty values will be modified. For example if you don't fill the ContactPhone field and that field has a value, it will retain that value after the update.
+
 ### Delete an application
 
 You can delete an existing application using the `DeleteApplication()` function:
