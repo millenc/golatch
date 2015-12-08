@@ -19,6 +19,15 @@ func NewLatchUser(userID string, secretKey string) *LatchUser {
 	}
 }
 
+//Shows existing applications
+func (l *LatchUser) ShowApplications() (response *LatchShowApplicationsResponse, err error) {
+	var resp *LatchResponse
+	if resp, err = l.DoRequest(NewLatchRequest(l.UserID, l.SecretKey, HTTP_METHOD_GET, GetLatchURL(API_APPLICATION_ACTION), nil, nil, t.Now()), &LatchShowApplicationsResponse{}); err == nil {
+		response = (*resp).(*LatchShowApplicationsResponse)
+	}
+	return response, err
+}
+
 //Deletes an existing application
 func (l *LatchUser) DeleteApplication(applicationId string) (err error) {
 	_, err = l.DoRequest(NewLatchRequest(l.UserID, l.SecretKey, HTTP_METHOD_DELETE, GetLatchURL(fmt.Sprint(API_APPLICATION_ACTION, "/", applicationId)), nil, nil, t.Now()), nil)

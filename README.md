@@ -237,6 +237,61 @@ once you have a response, you can use the following methods to get the informati
 	* `UserAgent`: user agent of the user that performed the action.
 	* `IP`: ip of the user that performed the action.
 
+##User API Usage
+
+Starting with API version 1.0 there's a User API that you can use to manage applications and get information about your subscription. The usage is pretty similar to the application API described in the previous section. The main diference is that instead of using the Application ID you have to use your User ID. Please note that all the functions described in this section require a GOLD or PLATINUM subscription in order to work.
+
+To start using this API, you have to create an instance of the `LatchUser` struct, that you will you use later to call the appropriate methods:
+
+``` go
+import "golatch"
+
+// ...
+latch := golatch.NewLatchUser("MyUserID", "MySecretKey")
+``` 
+
+### Show applications
+
+To get information about all the applications that you have defined in your account you can use the `ShowApplications()` function:
+
+``` go
+if response, err := latch.ShowApplications(); err == nil {
+	applications := response.Applications()
+
+	for applicationId, application := range applications {
+		fmt.Println(applicationId)
+		fmt.Println(application.Name)
+		fmt.Println(application.Secret)
+		fmt.Println(application.TwoFactor)
+		fmt.Println(application.LockOnRequest)
+		fmt.Println(application.ContactPhone)
+		fmt.Println(application.ContactEmail)
+		fmt.Println(application.ImageURL)
+	}
+}
+```
+
+This call will return a struct of type `LatchShowApplicationsResponse`. You can use the `Applications()` method of this struct to get the applications information as a map, where the key is the Application ID and the value is a struct of type `LatchApplicationInfo` with the following fields:
+
+* `Name`: Name of the application.
+* `Secret`: Secret key of the application.
+* `TwoFactor`: Two factor authentication.
+* `LockOnRequest`: Lock on request setting.
+* `ContactPhone`: Contact phone.
+* `ContactEmail`: Contact email.
+* `ImageURL`: Image URL
+* `Operations`: Map of `LatchOperation` structs with the application's operations.
+
+### Delete an application
+
+You can delete an existing application using the `DeleteApplication()` function:
+
+```go
+if err := latch.DeleteApplication("ApplicationID"); err == nil {
+	//Application was deleted successfully!
+}
+```
+
 ##Tests
  
 You can run unit tests for this package using:

@@ -68,16 +68,9 @@ type LatchHistoryResponse struct {
 }
 
 type LatchApplication struct {
-	Status        string                    `json:"status"`
-	PairedOn      uint64                    `json:"pairedOn"`
-	Name          string                    `json:"name"`
-	Description   string                    `json:"description"`
-	ImageURL      string                    `json:"imageURL"`
-	ContactPhone  string                    `json:"contactPhone"`
-	ContactEmail  string                    `json:"contactEmail"`
-	TwoFactor     string                    `json:"two_factor"`
-	LockOnRequest string                    `json:"lock_on_request"`
-	Operations    map[string]LatchOperation `json:"operations"`
+	Status   string `json:"status"`
+	PairedOn uint64 `json:"pairedOn"`
+	LatchApplicationInfo
 }
 
 type LatchHistoryEntry struct {
@@ -89,6 +82,24 @@ type LatchHistoryEntry struct {
 	Name      string `json:"name"`
 	UserAgent string `json:"userAgent"`
 	IP        string `json:"ip"`
+}
+
+type LatchShowApplicationsResponse struct {
+	Data struct {
+		Applications map[string]LatchApplicationInfo `json:"operations"`
+	} `json:"data"`
+}
+
+type LatchApplicationInfo struct {
+	Name          string                    `json:"name"`
+	Description   string                    `json:"description"`
+	Secret        string                    `json:"secret"`
+	ImageURL      string                    `json:"imageURL"`
+	ContactPhone  string                    `json:"contactPhone"`
+	ContactEmail  string                    `json:"contactEmail"`
+	TwoFactor     string                    `json:"two_factor"`
+	LockOnRequest string                    `json:"lock_on_request"`
+	Operations    map[string]LatchOperation `json:"operations"`
 }
 
 func (l *LatchErrorResponse) Unmarshal(Json string) error {
@@ -171,4 +182,12 @@ func (l *LatchHistoryResponse) HistoryCount() int {
 
 func (l *LatchHistoryResponse) History() []LatchHistoryEntry {
 	return l.Data.History
+}
+
+func (l *LatchShowApplicationsResponse) Unmarshal(Json string) (err error) {
+	return json.Unmarshal([]byte(Json), l)
+}
+
+func (l *LatchShowApplicationsResponse) Applications() map[string]LatchApplicationInfo {
+	return l.Data.Applications
 }

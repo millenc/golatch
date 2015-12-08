@@ -155,3 +155,37 @@ func TestLatchHistoryResponseUnmarshal(t *testing.T) {
 		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect history entry data json: %s , object %s", json, response)
 	}
 }
+
+func TestLatchShowApplicationsResponseUnmarshal(t *testing.T) {
+	json := `{"data":{"operations":{"2Wv8UqaT6iZRQEbyG9Kv":{"name":"GoLatch Test","two_factor":"DISABLED","lock_on_request":"DISABLED","secret":"aDYA2qVAv8wLgawGBWxhkv3EuBUgw6RBCy3nRmgv","contactPhone":"666111222","contactEmail":"millen@gmail.com","imageUrl":"https://s3-eu-west-1.amazonaws.com/latch-ireland/avatar1.jpg","operations":{"wJrfCBzZCtiZfVFwt9aJ":{"name":"Operation 1","two_factor":"DISABLED","lock_on_request":"DISABLED","operations":{"kyXLrHmbmiY4XjE9pyRL":{"name":"Testoperation","two_factor":"DISABLED","lock_on_request":"DISABLED","operations":{}}}},"h7jmVxJqPmgGBL2ba2rL":{"name":"Operation 2","two_factor":"DISABLED","lock_on_request":"DISABLED","operations":{}}}}}}}`
+
+	response := &LatchShowApplicationsResponse{}
+	err := response.Unmarshal(json)
+
+	if err != nil {
+		t.Errorf("LatchShowApplicationsResponse.Unmarshal() failed json: %q , error %q", json, err)
+	}
+
+	applications := response.Applications()
+	if len(applications) != 1 {
+		t.Errorf("LatchShowApplicationsResponse.Unmarshal() failed json: %q , incorrect number of applications returned (expected 1, got %d)", json, len(applications))
+	}
+
+	//Get first application
+	var applicationId string
+	var application LatchApplicationInfo
+	for applicationId, application = range applications {
+		break
+	}
+
+	if applicationId != "2Wv8UqaT6iZRQEbyG9Kv" ||
+		application.Name != "GoLatch Test" ||
+		application.Secret != "aDYA2qVAv8wLgawGBWxhkv3EuBUgw6RBCy3nRmgv" ||
+		application.TwoFactor != DISABLED ||
+		application.LockOnRequest != DISABLED ||
+		application.ContactPhone != "666111222" ||
+		application.ContactEmail != "millen@gmail.com" ||
+		application.ImageURL != "https://s3-eu-west-1.amazonaws.com/latch-ireland/avatar1.jpg" {
+		t.Errorf("LatchShowApplicationsResponse.Unmarshal() failed, incorrect history entry data json: %s , object %s", json, response)
+	}
+}
