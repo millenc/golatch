@@ -6,6 +6,7 @@ import (
 	t "time"
 )
 
+//Struct to use the Latch User API
 type LatchUser struct {
 	UserID    string
 	SecretKey string
@@ -18,6 +19,16 @@ func NewLatchUser(userID string, secretKey string) *LatchUser {
 		UserID:    userID,
 		SecretKey: secretKey,
 	}
+}
+
+//Gets the user's subscription information
+func (l *LatchUser) Subscription() (response *LatchSubscriptionResponse, err error) {
+	var resp *LatchResponse
+	if resp, err = l.DoRequest(NewLatchRequest(l.UserID, l.SecretKey, HTTP_METHOD_GET, GetLatchURL(API_SUBSCRIPTION_ACTION), nil, nil, t.Now()), &LatchSubscriptionResponse{}); err == nil {
+		response = (*resp).(*LatchSubscriptionResponse)
+	}
+
+	return response, err
 }
 
 //Shows existing applications

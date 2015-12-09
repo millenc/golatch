@@ -109,6 +109,22 @@ type LatchAddApplicationResponse struct {
 	} `json:"data"`
 }
 
+type LatchSubscriptionResponse struct {
+	Data struct {
+		Subscription struct {
+			ID           string                            `json:"id"`
+			Applications LatchSubscriptionUsage            `json:"applications"`
+			Operations   map[string]LatchSubscriptionUsage `json:"operations"`
+			Users        LatchSubscriptionUsage            `json:"users"`
+		} `json:"subscription"`
+	} `json:"data"`
+}
+
+type LatchSubscriptionUsage struct {
+	InUse int `json:"inUse"`
+	Limit int `json:"limit"`
+}
+
 func (l *LatchErrorResponse) Unmarshal(Json string) error {
 	return json.Unmarshal([]byte(Json), l)
 }
@@ -209,4 +225,24 @@ func (l *LatchAddApplicationResponse) AppID() string {
 
 func (l *LatchAddApplicationResponse) Secret() string {
 	return l.Data.Secret
+}
+
+func (l *LatchSubscriptionResponse) Unmarshal(Json string) (err error) {
+	return json.Unmarshal([]byte(Json), l)
+}
+
+func (l *LatchSubscriptionResponse) ID() string {
+	return l.Data.Subscription.ID
+}
+
+func (l *LatchSubscriptionResponse) Applications() LatchSubscriptionUsage {
+	return l.Data.Subscription.Applications
+}
+
+func (l *LatchSubscriptionResponse) Operations() map[string]LatchSubscriptionUsage {
+	return l.Data.Subscription.Operations
+}
+
+func (l *LatchSubscriptionResponse) Users() LatchSubscriptionUsage {
+	return l.Data.Subscription.Users
 }

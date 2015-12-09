@@ -205,3 +205,50 @@ func TestLatchAddApplicationResponseUnmarshal(t *testing.T) {
 		t.Errorf("LatchAddApplicationResponse.Unmarshal() failed, json: %s , object %s", json, response)
 	}
 }
+
+func TestLatchSubscriptionResponseUnmarshal(t *testing.T) {
+	json := `{"data":{"subscription":{"id":"vip","applications":{"inUse":3,"limit":-1},"operations":{"GoLatch Test":{"inUse":3,"limit":-1}},"users":{"inUse":1,"limit":-1}}}}`
+
+	response := &LatchSubscriptionResponse{}
+	err := response.Unmarshal(json)
+
+	if err != nil {
+		t.Errorf("LatchSubscriptionResponse.Unmarshal() failed json: %q , error %q", json, err)
+	}
+
+	//ID
+	if response.ID() != "vip" {
+		t.Errorf("LatchSubscriptionResponse.Unmarshal() failed expected ID: %q , got %q", "vip", response.ID())
+	}
+
+	//Applications
+	applications := response.Applications()
+	if applications.InUse != 3 || applications.Limit != -1 {
+		t.Errorf("LatchSubscriptionResponse.Unmarshal() failed expected Applications usage: (%d,%d) , got (%d,%d)", 3, -1, applications.InUse, applications.Limit)
+	}
+
+	//Operations
+	operations := response.Operations()
+	if len(operations) != 1 {
+		t.Errorf("LatchSubscriptionResponse.Unmarshal() failed expected 1 operation, got %q", operations)
+	} else {
+		//Get first operation
+		var name string
+		var usage LatchSubscriptionUsage
+		for name, usage = range operations {
+			break
+		}
+
+		if name != "GoLatch Test" ||
+			usage.InUse != 3 ||
+			usage.Limit != -1 {
+			t.Errorf("LatchSubscriptionResponse.Unmarshal() failed: expected 1 operation with name: %q,inUse: %d, Limit: %d and got %q, %d, %d", "GoLatch Test", 3, -1, name, usage.InUse, usage.Limit)
+		}
+	}
+
+	//Users
+	users := response.Users()
+	if users.InUse != 1 || users.Limit != -1 {
+		t.Errorf("LatchSubscriptionResponse.Unmarshal() failed expected users usage: (%d,%d) , got (%d,%d)", 1, -1, users.InUse, users.Limit)
+	}
+}

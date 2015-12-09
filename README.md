@@ -329,6 +329,28 @@ if err := latch.DeleteApplication("ApplicationID"); err == nil {
 }
 ```
 
+### Subscription
+
+You can get your current subscription information using the `Subscription()` method:
+
+```go
+if response, err := latch.Subscription(); err == nil {
+	ID := response.ID()
+	applications := response.Applications()
+	users := response.Users()
+	operations := response.Operations()
+}
+```
+
+This method will return a struct of type `LatchSubscriptionResponse` with the following methods (that you can use to get information about your subscription):
+
+* `ID()`: Gets the ID of your account/subscription type (for example "vip" for a VIP account).
+* `Applications()`: Returns a struct of type `LatchSubscriptionUsage` with the following fields:
+	* `InUse`: Number of applications currently being used.
+	* `Limit`: Max number of applications that you can create (-1 for no limit).
+* `Users()`: Returns a struct of type `LatchSubscriptionUsage` with the current number of users (InUse) and max number of users allowed (Limit).
+* `Operations()`: Returns a map of `LatchSubscriptionUsage` keyed by application name that contains the current number of operations (InUse) and the max number of operations for each application (Limit).
+
 ##Tests
  
 You can run unit tests for this package using:
