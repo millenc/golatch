@@ -211,7 +211,7 @@ if response, err := latch.History(accountId, from, to); err == nil {
 	history := response.History()	
 }
 ```
-once you have a response, you can use the following methods to get the information contained in it:
+The `from` and `to` dates are optional. If you don't want to specify any of the dates you can pass an empty (non initialized) `Time` struct, that is `time.Time{}`. Once you have a response, you can use the following methods to get the information contained in it:
 
 * `Application()`: returns a struct of type `LatchApplication` with information about the application. This struct has the following fields:
 	* `Status`: status of the application (on/off).
