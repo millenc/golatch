@@ -95,7 +95,7 @@ func TestLatchShowOperationResponseUnmarshal(t *testing.T) {
 }
 
 func TestLatchHistoryResponseUnmarshal(t *testing.T) {
-	json := `{"data":{"2Wv8UqaT6iZRQEbyG9Kv":{"status":"on","pairedOn":1428528090941,"name":"GoLatch Test","description":"","imageURL":"https://s3-eu-west-1.amazonaws.com/latch-ireland/avatar1.jpg","contactPhone":"666111222","contactEmail":"","two_factor":"DISABLED","lock_on_request":"DISABLED","operations":{"wJrfCBzZCtiZfVFwt9aJ":{"name":"Operation 1","status":"on","two_factor":"off","lock_on_request":"off","operations":{}}}},"lastSeen":1428858456785,"clientVersion":{"Android":"1.4.1"},"count":5,"history":[{"t":1428528254424,"action":"get","what":"status","value":"on","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"},{"t":1428528260264,"action":"USER_UPDATE","what":"status","value":"off","was":"on","name":"GoLatch Test","userAgent":"","ip":"127.0.0.1"},{"t":1428528264520,"action":"get","what":"status","value":"off","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"},{"t":1428528274326,"action":"USER_UPDATE","what":"status","value":"on","was":"off","name":"GoLatch Test","userAgent":"","ip":"127.0.0.1"},{"t":1428528277313,"action":"get","what":"status","value":"on","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"}]}}`
+	json := `{"data":{"2Wv8UqaT6iZRQEbyG9Kv":{"status":"on","pairedOn":1428528090941,"name":"GoLatch Test","description":"","imageURL":"https://s3-eu-west-1.amazonaws.com/latch-ireland/avatar1.jpg","contactPhone":"666111222","contactEmail":"","two_factor":"DISABLED","lock_on_request":"DISABLED","operations":{"wJrfCBzZCtiZfVFwt9aJ":{"name":"Operation 1","status":"on","two_factor":"off","lock_on_request":"off","operations":{}}}},"lastSeen":1428858456785,"clientVersion":[{"platform":"Android","app":"1.5.1"}],"count":5,"history":[{"t":1428528254424,"action":"get","what":"status","value":"on","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"},{"t":1428528260264,"action":"USER_UPDATE","what":"status","value":"off","was":"on","name":"GoLatch Test","userAgent":"","ip":"127.0.0.1"},{"t":1428528264520,"action":"get","what":"status","value":"off","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"},{"t":1428528274326,"action":"USER_UPDATE","what":"status","value":"on","was":"off","name":"GoLatch Test","userAgent":"","ip":"127.0.0.1"},{"t":1428528277313,"action":"get","what":"status","value":"on","was":"-","name":"GoLatch Test","userAgent":"Go 1.1 package http","ip":"127.0.0.1"}]}}`
 	response := &LatchHistoryResponse{AppID: "2Wv8UqaT6iZRQEbyG9Kv"}
 
 	err := response.Unmarshal(json)
@@ -137,7 +137,7 @@ func TestLatchHistoryResponseUnmarshal(t *testing.T) {
 	}
 
 	//Test Client Version
-	if client := clientVersion["Android"]; len(clientVersion) != 1 || client != "1.4.1" {
+	if clientVersion[0].Platform != "Android" || clientVersion[0].App != "1.5.1" {
 		t.Errorf("LatchHistoryResponse.Unmarshal() failed, incorrect clientVersion data json: %s , object %s", json, response)
 	}
 

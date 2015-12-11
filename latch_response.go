@@ -59,11 +59,11 @@ type LatchOperation struct {
 type LatchHistoryResponse struct {
 	AppID string
 	Data  struct {
-		Application   LatchApplication    `json:"application"`
-		LastSeen      uint64              `json:"lastSeen"`
-		ClientVersion map[string]string   `json:"clientVersion"`
-		HistoryCount  int                 `json:"count"`
-		History       []LatchHistoryEntry `json:"history"`
+		Application   LatchApplication     `json:"application"`
+		LastSeen      uint64               `json:"lastSeen"`
+		ClientVersion []LatchClientVersion `json:"clientVersion"`
+		HistoryCount  int                  `json:"count"`
+		History       []LatchHistoryEntry  `json:"history"`
 	} `json:"data"`
 }
 
@@ -71,6 +71,11 @@ type LatchApplication struct {
 	Status   string `json:"status"`
 	PairedOn uint64 `json:"pairedOn"`
 	LatchApplicationInfo
+}
+
+type LatchClientVersion struct {
+	Platform string `json:platform`
+	App      string `json:app`
 }
 
 type LatchHistoryEntry struct {
@@ -195,7 +200,7 @@ func (l *LatchHistoryResponse) LastSeen() uint64 {
 	return l.Data.LastSeen
 }
 
-func (l *LatchHistoryResponse) ClientVersion() map[string]string {
+func (l *LatchHistoryResponse) ClientVersion() []LatchClientVersion {
 	return l.Data.ClientVersion
 }
 
