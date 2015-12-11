@@ -225,7 +225,9 @@ once you have a response, you can use the following methods to get the informati
 	* `LockOnRequest`: lock on request setting.
 	* `Operations`: array of LatchOperation structs containing information about the operations defined for the application.
 * `LastSeen()`: last time there was user activity for this account.
-* `ClientVersion()`: map containing information about clients (key) and versions (value) used by the user.
+* `ClientVersion()`: Contains information about the platforms and versions used by the client. The returned value is an array of structs `LatchClientVersion` where each value has the following fields:
+	* `Platform`: Name of the platform ("Android" for example).
+	* `App`: Version.
 * `HistoryCount()`: number of history entries in the response.
 * `History()`: history entries. Array of structs of type `LatchHistoryEntry`:
 	* `Time`: time of this action.
