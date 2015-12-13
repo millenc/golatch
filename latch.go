@@ -167,7 +167,7 @@ func (l *Latch) History(accountId string, from t.Time, to t.Time) (response *Lat
 	if !to.IsZero() {
 		query = fmt.Sprint(query, fmt.Sprintf("/%d", to.UnixNano()/1000000))
 	}
-	fmt.Println(query)
+
 	if resp, err = l.DoRequest(NewLatchRequest(l.AppID, l.SecretKey, HTTP_METHOD_GET, GetLatchURL(query), nil, nil, t.Now()), &LatchHistoryResponse{AppID: l.AppID}); err == nil {
 		response = (*resp).(*LatchHistoryResponse)
 	}
