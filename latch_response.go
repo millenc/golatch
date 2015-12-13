@@ -33,7 +33,7 @@ type LatchOperationStatus struct {
 
 type LatchTwoFactor struct {
 	Token     string `json:"token"`
-	Generated uint64 `json:"generated"`
+	Generated int64  `json:"generated"`
 }
 
 type LatchAddOperationResponse struct {
@@ -60,7 +60,7 @@ type LatchHistoryResponse struct {
 	AppID string
 	Data  struct {
 		Application   LatchApplication     `json:"application"`
-		LastSeen      uint64               `json:"lastSeen"`
+		LastSeen      int64                `json:"lastSeen"`
 		ClientVersion []LatchClientVersion `json:"clientVersion"`
 		HistoryCount  int                  `json:"count"`
 		History       []LatchHistoryEntry  `json:"history"`
@@ -69,7 +69,7 @@ type LatchHistoryResponse struct {
 
 type LatchApplication struct {
 	Status   string `json:"status"`
-	PairedOn uint64 `json:"pairedOn"`
+	PairedOn int64  `json:"pairedOn"`
 	LatchApplicationInfo
 }
 
@@ -79,7 +79,7 @@ type LatchClientVersion struct {
 }
 
 type LatchHistoryEntry struct {
-	Time      uint64 `json:"t"`
+	Time      int64  `json:"t"`
 	Action    string `json:"action"`
 	What      string `json:"what"`
 	Value     string `json:"value"`
@@ -196,7 +196,7 @@ func (l *LatchHistoryResponse) Application() LatchApplication {
 	return l.Data.Application
 }
 
-func (l *LatchHistoryResponse) LastSeen() uint64 {
+func (l *LatchHistoryResponse) LastSeen() int64 {
 	return l.Data.LastSeen
 }
 
