@@ -118,10 +118,10 @@ func (l *Latch) ShowOperation(operationId string) (response *LatchShowOperationR
 func (l *Latch) Status(accountId string, nootp bool, silent bool) (response *LatchStatusResponse, err error) {
 	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId)
 	if nootp {
-		query = fmt.Sprint(query, API_NOOTP_SUFFIX)
+		query = fmt.Sprint(query, "/", API_NOOTP_SUFFIX)
 	}
 	if silent {
-		query = fmt.Sprint(query, API_SILENT_SUFFIX)
+		query = fmt.Sprint(query, "/", API_SILENT_SUFFIX)
 	}
 
 	return l.StatusRequest(query)
@@ -133,10 +133,10 @@ func (l *Latch) Status(accountId string, nootp bool, silent bool) (response *Lat
 func (l *Latch) OperationStatus(accountId string, operationId string, nootp bool, silent bool) (response *LatchStatusResponse, err error) {
 	query := fmt.Sprint(API_CHECK_STATUS_ACTION, "/", accountId, "/op/", operationId)
 	if nootp {
-		query = fmt.Sprint(query, API_NOOTP_SUFFIX)
+		query = fmt.Sprint(query, "/", API_NOOTP_SUFFIX)
 	}
 	if silent {
-		query = fmt.Sprint(query, API_SILENT_SUFFIX)
+		query = fmt.Sprint(query, "/", API_SILENT_SUFFIX)
 	}
 
 	return l.StatusRequest(query)
