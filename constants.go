@@ -41,4 +41,7 @@ const (
 	HTTP_METHOD_GET    = "GET"
 	HTTP_METHOD_PUT    = "PUT"
 	HTTP_METHOD_DELETE = "DELETE"
+
+	//User agent
+	HTTP_USER_AGENT = "Golatch 1.0"
 )

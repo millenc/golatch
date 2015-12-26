@@ -26,6 +26,7 @@ func (l *LatchAPI) DoRequest(request *LatchRequest, responseType LatchResponse) 
 
 	//Perform the request
 	req := request.GetHttpRequest()
+	req.Header.Set("User-Agent", HTTP_USER_AGENT)
 	if resp, err = client.Do(req); err != nil {
 		return
 	}
