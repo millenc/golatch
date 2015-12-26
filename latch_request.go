@@ -153,6 +153,7 @@ func (l *LatchRequest) GetHttpRequest() *http.Request {
 	if l.HttpMethod == HTTP_METHOD_PUT || l.HttpMethod == HTTP_METHOD_POST {
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
+	request.Header.Set("User-Agent", HTTP_USER_AGENT)
 
 	return request
 }

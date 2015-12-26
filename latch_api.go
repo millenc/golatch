@@ -10,7 +10,9 @@ import (
 )
 
 type LatchAPI struct {
-	Proxy *url.URL
+	Proxy             *url.URL
+	OnRequestStart    func(request *LatchRequest)
+	OnResponseReceive func(request *LatchRequest, response *http.Response, responseBody string)
 }
 
 func (l *LatchAPI) DoRequest(request *LatchRequest, responseType LatchResponse) (response *LatchResponse, err error) {
@@ -26,7 +28,10 @@ func (l *LatchAPI) DoRequest(request *LatchRequest, responseType LatchResponse) 
 
 	//Perform the request
 	req := request.GetHttpRequest()
-	req.Header.Set("User-Agent", HTTP_USER_AGENT)
+
+	if l.OnRequestStart != nil {
+		l.OnRequestStart(request)
+	}
 	if resp, err = client.Do(req); err != nil {
 		return
 	}
@@ -35,6 +40,10 @@ func (l *LatchAPI) DoRequest(request *LatchRequest, responseType LatchResponse) 
 	defer resp.Body.Close()
 	if body, err = ioutil.ReadAll(resp.Body); err != nil {
 		return
+	}
+
+	if l.OnResponseReceive != nil {
+		l.OnResponseReceive(request, resp, string(body))
 	}
 
 	//Handle HTTP errors
