@@ -86,7 +86,7 @@ Upon success, this method will return a `response` struct of type `LatchStatusRe
 ``` go
 status := response.Status()
 if status == golatch.LATCH_STATUS_ON {
-	//Latch is ON for this account, don't let the user log in (for example)
+	//Account is ON (latch is deactivated), let the user log in (for example)
 }
 ```
 As you can see in the previous snippet, to determine the status of an account it's recommended that you use the `golatch.LATCH_STATUS_ON` (ON status) and `golatch.LATCH_STATUS_OFF` (OFF status) constants.

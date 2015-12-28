@@ -71,7 +71,7 @@ func (l *LatchAPI) DoRequest(request *LatchRequest, responseType LatchResponse) 
 }
 
 //Sets the proxy URL to be used in all requests to the API
-func (l *Latch) SetProxy(proxyURL *url.URL) {
+func (l *LatchAPI) SetProxy(proxyURL *url.URL) {
 	l.Proxy = proxyURL
 }
 
