@@ -142,7 +142,6 @@ func (l *LatchRequest) GetHttpRequest() *http.Request {
 		body = strings.NewReader(l.Params.Encode())
 	}
 
-	//TODO: Get the URL from the LatchRequest?
 	request, _ := http.NewRequest(l.HttpMethod, l.URL.String(), body)
 
 	//Set Headers
