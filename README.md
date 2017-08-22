@@ -1,8 +1,8 @@
-#golatch [![Build Status](https://travis-ci.org/millenc/golatch.svg?branch=master)](https://travis-ci.org/millenc/golatch)
+# golatch [![Build Status](https://travis-ci.org/millenc/golatch.svg?branch=master)](https://travis-ci.org/millenc/golatch)
 
 **golatch** is a package that easily lets you integrate [Latch](https://latch.elevenpaths.com/) in your [Go](https://golang.org/) applications. If you don't know what Latch is or how to use it please visit their [official site](https://latch.elevenpaths.com/).
 
-##Installation
+## Installation
 
 
 You can download the package manually and put it in your `/src` folder or use `go get`:
@@ -12,7 +12,7 @@ $ go get github.com/millenc/golatch
 ```
 You can also use `go get -u` to update the package. 
 
-##Usage
+## Usage
 
 First you need to create the Latch struct that you will use to call all the operations of the API:
 
@@ -24,7 +24,7 @@ latch := golatch.NewLatch("MyAppID", "MySecretKey")
 ``` 
 where "MyAppID" and "MySecretKey" are your application's ID and secret key respectively. You can find this information in the developer's area of the official website once you create your application.
 
-###Pairing
+### Pairing
 
 You can use the `Pair()` method providing the pairing token supplied by the user:
 
@@ -41,7 +41,7 @@ if err == nil {
 ```
 You must store this account ID together with the user information to use it in future API calls.
 
-###Unpairing
+### Unpairing
 
 Call the `Unpair()` method and pass the Account ID you want to unpair as argument:
 
@@ -53,7 +53,7 @@ if err := latch.Unpair("AccountID"); err != nil {
 
 If no error is returned, the account has been unpaired successfully.
 
-###Locking/unlocking
+### Locking/unlocking
 
 *NOTE*: These methods require a GOLD or PLATINUM subscription in order to work. If you don't have any of these types of subscriptions you will get an error.
 
@@ -70,7 +70,7 @@ err := latch.LockOperation("AccountID", "MyOperationID")
 err := latch.UnlockOperation("AccountID", "MyOperationID")
 ```
 
-###Status
+### Status
 
 To get the current status of an account, you can use the `Status()` method:
 
@@ -117,7 +117,7 @@ operations := operation_status.Operations
 ```
 The information contained in these fields is the same that has been previously discussed.
 
-###Operation Status
+### Operation Status
 
 **IMPORTANT**: If you have created operations for your application you should not query the status of the application, but rather the status of individual operations. To do so, you can use the `OperationStatus()` method:
 
@@ -128,7 +128,7 @@ if response, err := latch.OperationStatus("AccountID", "MyOperationID", false, f
 ```
 If the third parameter is `true` (nootp), then no One-time password information will be included in the response. If the fourth parameter is `true` (silent) Latch will not send a push notification to the user alerting of the access if the operation's latch is on (this requires a SILVER, GOLD or PLATINUM subscription). The response is of the same type and contains the same information as the one returned by the `Status()` method.
 
-###Managing operations
+### Managing operations
 
 You can create/edit/delete operations directly from your application:
 
@@ -239,7 +239,7 @@ The `from` and `to` dates are optional. If you don't want to specify any of the 
 	* `UserAgent`: user agent of the user that performed the action.
 	* `IP`: ip of the user that performed the action.
 
-##User API Usage
+## User API Usage
 
 Starting with API version 1.0 there's a User API that you can use to manage applications and get information about your subscription. The usage is pretty similar to the application API described in the previous section. The main diference is that instead of using the Application ID you have to use your User ID. Please note that all the functions described in this section require a GOLD or PLATINUM subscription in order to work.
 
@@ -353,7 +353,7 @@ This method will return a struct of type `LatchSubscriptionResponse` with the fo
 * `Users()`: Returns a struct of type `LatchSubscriptionUsage` with the current number of users (InUse) and max number of users allowed (Limit).
 * `Operations()`: Returns a map of `LatchSubscriptionUsage` keyed by application name that contains the current number of operations (InUse) and the max number of operations for each application (Limit).
 
-##Tests
+## Tests
  
 You can run unit tests for this package using:
 
@@ -361,7 +361,7 @@ You can run unit tests for this package using:
 $ go test golatch
 ```
 
-##Documentation
+## Documentation
 
 Documentation is provided by *godoc* as usual:
 
@@ -372,6 +372,6 @@ You can also view the godoc's HTML documentation starting a web server (`godoc -
 
 Aditionally you can browse the documentation online [here](http://godoc.org/github.com/millenc/golatch).
 
-##Contributions
+## Contributions
 
 All contributions are welcome! This is my first Go package ever, so if you're an experienced Go developer and want to share some advice or suggest any improvement to the code it will be greatly appreciated.
